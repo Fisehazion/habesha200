@@ -1,0 +1,829 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Behabeshawikana offers expert script writing and content development for Tech, Business related, EOTC tradition based spiritual scripts. Get compelling narratives today.">
+    <meta name="keywords" content="script writing, content development, EOTC spiritual content, Tech content, business narratives">
+    
+    <title>Behabeshawikana - Script Writing & Content Development Platform</title>
+    <!-- Favicon (TODO: Replace with your logo) -->
+    <link rel="icon" type="images/jpg" href="images/ChatGPT Image Aug 28, 2025, 11_33_43 PM.png">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        /* Original inline styles */
+        @media (max-width: 640px) {
+            .logo-container {
+                justify-content: flex-end;
+                padding-right: 1rem;
+            }
+            #nav-menu {
+                display: none;
+            }
+            .mobile-menu {
+                display: block;
+                position: absolute;
+                top: 100%;
+                right: 0;
+                background-color: white;
+                width: 200px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                border-radius: 0 0 0.5rem 0.5rem;
+            }
+            .mobile-menu a {
+                display: block;
+                padding: 0.75rem 1rem;
+                color: #4b5563;
+                font-weight: 600;
+                transition: color 0.3s;
+            }
+            .mobile-menu a:hover {
+                color: #1a202c;
+            }
+        }
+        @media (min-width: 641px) {
+            .mobile-menu {
+                display: none;
+            }
+            #nav-menu {
+                display: flex;
+            }
+        }
+
+        /* Original styles.css content with improvements for contrast and eye-catching */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Preloader */
+        #preloader {
+            transition: opacity .5s ease-out;
+        }
+        #preloader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1a202c;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin .8s linear infinite;
+            will-change: transform;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Hero Background */
+        .hero-bg {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('images/Gemini_Generated_Image_stieudstieudstie.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* Fade-in Animation */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s ease-out, transform .8s ease-out;
+        }
+        .fade-in-up.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Social Media Icon Glow Effect */
+        .social-icon {
+            transition: all .3s ease;
+        }
+        .social-icon:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 15px rgba(255,255,255,0.8), 0 0 20px rgba(26,32,44,0.5);
+        }
+        .team .social-icon:hover {
+            box-shadow: 0 0 15px rgba(26,32,44,0.8), 0 0 20px rgba(255,255,255,0.5);
+        }
+
+        /* Button Enhancements */
+        button, a[role="button"] {
+            transition: all .3s ease;
+        }
+        button:hover, a[role="button"]:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* Chatbot Modal */
+        #chatbot-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .chat-window {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            width: 90%;
+            max-width: 400px;
+            height: 60vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .chat-header {
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+        .chat-body {
+            flex-grow: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            background-color: #f7fafc;
+        }
+        .message {
+            max-width: 80%;
+            padding: .75rem 1rem;
+            border-radius: 16px;
+        }
+        .user-message {
+            background-color: #e2e8f0;
+            align-self: flex-end;
+            color: #1a202c; /* Improved contrast */
+        }
+        .bot-message {
+            background-color: #2d3748;
+            color: white;
+            align-self: flex-start;
+        }
+        .chat-input {
+            padding: 1rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: .5rem;
+        }
+
+        /* FAQ Styles */
+        .faq-item details > summary::-webkit-details-marker {
+            display: none;
+        }
+        .faq-item details > summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 1rem;
+            border-radius: .75rem;
+            background-color: #edf2f7;
+            transition: background-color .3s, transform .3s;
+        }
+        .faq-item details[open] > summary {
+            background-color: #e2e8f0;
+            transform: scale(1.02);
+        }
+        .faq-item details > summary::after {
+            content: '+';
+            font-size: 1.5rem;
+            font-weight: bold;
+            transition: transform .3s;
+        }
+        .faq-item details[open] > summary::after {
+            content: '-';
+            transform: rotate(180deg);
+        }
+
+        /* Back to Top Button */
+        #back-to-top {
+            transition: all .3s ease;
+        }
+        #back-to-top.visible {
+            display: block;
+        }
+
+        /* Contact Form Styling */
+        form[max-w-xs] {
+            max-width: 20rem; /* Adjusted to align with centered layout */
+            margin: 0 auto; /* Centers the form */
+            padding: 0 1rem; /* Matches container padding for consistency */
+        }
+        textarea {
+            height: 6rem; /* Reduced height for smaller interface */
+        }
+
+        /* Container Alignment */
+        .container {
+            max-width: 960px; /* Matches max-w-5xl from Team Section */
+            margin-left: auto;
+            margin-right: auto;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        @media (min-width: 640px) {
+            .container {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+        }
+        @media (min-width: 1024px) {
+            .container {
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+        }
+
+        /* Dynamic and Shining Background Enhancements for 2025 UI */
+        body {
+            background: linear-gradient(-45deg, #f7fafc, #e0e7ff, #d1fae5, #fef3c7);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .hero-bg {
+            background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.4)), url('images/Gemini_Generated_Image_stieudstieudstie.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(59, 130, 246, 0.2), rgba(236, 72, 153, 0.2), rgba(16, 185, 129, 0.2));
+            animation: shimmer 5s ease-in-out infinite;
+            z-index: 1;
+        }
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); opacity: 0.3; }
+            50% { transform: translateX(100%); opacity: 0.6; }
+            100% { transform: translateX(-100%); opacity: 0.3; }
+        }
+        .hero-bg > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Eye-catching CTA animation */
+        .cta-button {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Improved contrast for texts */
+        .text-gray-600 {
+            color: #374151; /* Darker gray for better contrast */
+        }
+        .text-gray-700 {
+            color: #1f2937; /* Darker */
+        }
+
+        /* Glowing and motion sensible buttons and hovers */
+        a:hover, button:hover {
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            filter: brightness(1.1);
+            transition: box-shadow 0.3s ease, filter 0.3s ease, transform 0.3s ease;
+        }
+
+        .bg-gradient-to-r.from-gray-900.to-gray-700:hover {
+            box-shadow: 0 0 25px rgba(55, 65, 81, 0.8);
+        }
+
+        .bg-white.text-gray-900:hover {
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Beautifying recommendations: Add card styles to team members */
+        .team-member {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .team-member:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        /* Ensure responsiveness */
+        @media (max-width: 768px) {
+            .team-grid {
+                grid-template-columns: repeat(1, minmax(0, 1fr));
+            }
+        }
+    </style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MHJ63C4XVD"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-MHJ63C4XVD');
+</script>
+</head>
+<body>
+    <!-- Preloader -->
+    <div id="preloader" class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
+        <div class="loader"></div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white shadow-lg sticky top-0 z-40">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-3 flex items-center relative">
+            <!-- Logo on the left -->
+            <div class="logo-container flex items-center mr-4">
+                <img src="images/ChatGPT Image Aug 28, 2025, 11_33_43 PM.png" alt="Behabeshawi-Kana Logo" class="h-6 sm:h-8 md:h-10 w-12 sm:w-16 md:w-20 object-contain">
+            </div>
+            <div class="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900">Behabeshawi-Kana</div>
+            <div class="flex items-center ml-auto">
+                <!-- Desktop Navigation -->
+                <nav class="space-x-4 sm:space-x-6 md:space-x-8 hidden md:flex" id="nav-menu">
+                    <a href="#home" class="text-gray-600 hover:text-gray-900 font-semibold transition duration-300" data-scroll>Home</a>
+                    <a href="#about" class="text-gray-600 hover:text-gray-900 font-semibold transition duration-300" data-scroll>About</a>
+                    <a href="#services" class="text-gray-600 hover:text-gray-900 font-semibold transition duration-300" data-scroll>Services</a>
+                    <a href="#order" class="text-gray-600 hover:text-gray-900 font-semibold transition duration-300" data-scroll>Order</a>
+                    <a href="#contact" class="text-gray-600 hover:text-gray-900 font-semibold transition duration-300" data-scroll>Contact</a>
+                </nav>
+                <!-- Mobile Menu Toggle -->
+                <button id="mobile-menu-toggle" class="md:hidden text-gray-600 hover:text-gray-900 ml-4" title="Open navigation menu" aria-label="Open navigation menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                <!-- Mobile Menu -->
+                <div id="mobile-menu" class="mobile-menu hidden">
+                    <a href="#home" class="text-gray-600 hover:text-gray-900 font-semibold transition duration-300" data-scroll>Home</a>
+                    <a href="#about" class="text-gray-600 hover:text-gray-900 font-semibold transition duration-300" data-scroll>About</a>
+                    <a href="#services" class="text-gray-600 hover:text-gray-900 font-semibold transition duration-300" data-scroll>Services</a>
+                    <a href="#order" class="text-gray-600 hover:text-gray-900 font-semibold transition duration-300" data-scroll>Order</a>
+                    <a href="#contact" class="text-gray-600 hover:text-gray-900 font-semibold transition duration-300" data-scroll>Contact</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="hero-bg text-white py-16 sm:py-20 md:py-24 lg:py-36">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center fade-in-up">
+                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold mb-4 sm:mb-6 leading-tight">Crafting Stories That Inspire</h1>
+                <p class="text-lg sm:text-xl md:text-2xl lg:text-3xl mb-6 sm:mb-10 font-light max-w-xl sm:max-w-2xl md:max-w-3xl mx-auto">Behabeshawikana delivers compelling narratives for all media with expert writers and strategists.</p>
+                <a href="#services" class="bg-gradient-to-r from-gray-900 to-gray-700 text-white font-bold py-3 sm:py-4 px-6 sm:px-10 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button" data-scroll>Discover Our Services</a>
+            </div>
+        </section>
+
+        <!-- CTA Banner -->
+        <section class="py-8 sm:py-10 bg-gradient-to-r from-gray-800 to-gray-600 text-white text-center">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 fade-in-up">
+                <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">Ready to Tell Your Story?</h2>
+                <p class="text-base sm:text-lg mb-4 sm:mb-6 max-w-md sm:max-w-xl mx-auto">Partner with us to create impactful content that resonates with your audience.</p>
+                <a href="#order" class="bg-white text-gray-900 font-bold py-2 sm:py-3 px-6 rounded-full shadow-lg hover:bg-gray-200 hover:scale-105 transition duration-300 cta-button" data-scroll>Start Your Project</a>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-gray-50 to-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="max-w-2xl sm:max-w-3xl md:max-w-4xl mx-auto text-center fade-in-up">
+                    <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 sm:mb-6 text-gray-900">About Behabeshawikana</h2>
+                    <p class="text-base sm:text-lg text-gray-700 leading-relaxed mb-3 sm:mb-4">Behabeshawikana transforms ideas into stories that captivate and inspire. Our diverse team creates authentic, high-quality content tailored to tech related, spiritual, and business needs.</p>
+                    <p class="text-base sm:text-lg text-gray-700 leading-relaxed">From research-driven tech content to meaningful EOTC spiritual works, we’re dedicated to delivering excellence.</p>
+                </div>
+                <div class="flex justify-center mt-6 sm:mt-8 md:mt-12 fade-in-up">
+                    <a href="#team" class="bg-gradient-to-r from-gray-900 to-gray-700 text-white font-bold py-3 sm:py-4 px-8 sm:px-10 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button" data-scroll>Meet Our Team</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" class="py-12 sm:py-16 md:py-20 bg-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-6 sm:mb-8 md:mb-12 fade-in-up">Our Core Services</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                    <!-- Technical Content -->
+                    <div class="bg-gray-100 p-4 sm:p-6 rounded-2xl shadow-lg transition transform hover:scale-105 hover:shadow-2xl fade-in-up">
+                        <div class="flex items-center justify-center h-12 sm:h-16 w-12 sm:w-16 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-full mx-auto mb-3 sm:mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-semibold text-center mb-2 sm:mb-4">Tech related script writing services</h3>
+                        <p class="text-gray-600 text-center text-sm sm:text-base">Clear, accurate, and engaging technical documentation, blogs, and articles for the tech industry.</p>
+                    </div>
+                    
+                    <!-- Business Content -->
+                    <div class="bg-gray-100 p-4 sm:p-6 rounded-2xl shadow-lg transition transform hover:scale-105 hover:shadow-2xl fade-in-up">
+                        <div class="flex items-center justify-center h-12 sm:h-16 w-12 sm:w-16 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-full mx-auto mb-3 sm:mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-semibold text-center mb-2 sm:mb-4">Business Related Content script writing services</h3>
+                        <p class="text-gray-600 text-center text-sm sm:text-base">Promotional scripts and ad copy to effectively reach your audience.</p>
+                    </div>
+                    <!-- EOTC Spiritual Content -->
+                    <div class="bg-gray-100 p-4 sm:p-6 rounded-2xl shadow-lg transition transform hover:scale-105 hover:shadow-2xl fade-in-up">
+                        <div class="flex items-center justify-center h-12 sm:h-16 w-12 sm:w-16 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-full mx-auto mb-3 sm:mb-6">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                        </div>
+                        <h3 class="text-lg sm:text-xl font-semibold text-center mb-2 sm:mb-4">EOTC Spiritual Content script writing services</h3>
+                        <p class="text-gray-600 text-center text-sm sm:text-base">Uplifting content scripts based on Ethiopian Orthodox Tewahedo Church traditions.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Order Section -->
+        <section id="order" class="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-gray-50 to-white">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center fade-in-up">
+                <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 sm:mb-6 text-gray-900">How to Place an Order</h2>
+                <p class="text-base sm:text-lg text-gray-700 max-w-xl sm:max-w-2xl md:max-w-3xl mx-auto mb-4 sm:mb-8 leading-relaxed">Fill out our Google Form to start your project. We’ll contact you via your provided telegram username or email to discuss details and handle payment securely.</p>
+                <!-- TODO: Replace '#' with your actual Google Form URL -->
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSc_oZ-3MRfnn1w7rqSXk8leixjMI_8L94HihD8CFvJ8R0sDqQ/viewform?usp=dialog" class="bg-gradient-to-r from-gray-900 to-gray-700 text-white font-bold py-3 sm:py-4 px-6 sm:px-10 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button" target="_blank" rel="noopener noreferrer">Place an Order Now</a>
+            </div>
+        </section>
+
+    
+<!-- Team Section -->
+<section id="team" class="py-12 sm:py-16 md:py-20 bg-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-6 sm:mb-8 md:mb-12 fade-in-up">Meet the Team</h2>
+        <div class="flex justify-center">
+            <div class="team-grid grid grid-cols-1 md:grid-cols-2 gap-8 auto-rows-auto max-w-5xl w-full px-4">
+                <!-- Team Member 1 -->
+              <!-- Team Member 1 -->
+    <div class="text-center fade-in-up team-member">
+        <img class="w-24 sm:w-28 md:w-32 h-24 sm:h-28 md:h-32 mx-auto rounded-full object-cover mb-3 sm:mb-4 shadow-md" src="images/photo_2024-01-12_13-44-25.jpg" alt="Fisehatsion Adisu">
+        <h3 class="text-lg sm:text-xl font-bold text-gray-900">Fisehatsion Adisu</h3>
+        <p class="text-gray-600 mb-1 sm:mb-2">Lead Script Writer & Founder of Behabeshawikana</p>
+        <p class="text-sm text-gray-500 mb-2 sm:mb-4">Over 1 year in scriptwriting and content creation, specializing in character-driven storytelling. I’ve written 9+ successful YouTube video scripts, all production-ready and produced. As the lead script writer at Habeshawi-Kana, I ensure every script aligns with the brand vision and delivers high-quality, engaging content. Passionate about authentic storytelling that connects and inspires.</p>
+        <div class="flex justify-center space-x-3 sm:space-x-4">
+            <a href="https://www.facebook.com/dfisa.adisu" aria-label="Facebook profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+            </a>
+            <a href="https://www.linkedin.com/in/fisehatsion-adisu-abute-929279208" aria-label="LinkedIn profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+            </a>
+            <a href="https://www.instagram.com/dfisaadisu?igsh=YzljYTk1ODg3Zg==" aria-label="Instagram profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            </a>
+            <a href="https://vm.tiktok.com/ZMAFrYpFy/" aria-label="TikTok profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12a4 4 0 1 0 4-4 4 4 0 0 0-4 4zm0 0v6a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2v-2"></path><path d="M12 10v6"></path><path d="M12 8h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-3"></path><path d="M19 8V6a2 2 0 0 0-2-2h-2"></path></svg>
+            </a>
+            <a href="https://t.me/fisiha1224" aria-label="Telegram profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 17-5-4-3 2-3-10 13-5z"></path></svg>
+            </a>
+        </div>
+        <div class="mt-4">
+            <a href="https://fisehatsion-adisu-portfolio.netlify.app/" aria-label="Visit my portfolio" class="inline-flex items-center bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 px-4 sm:px-6 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button">
+                Visit my portfolio
+            </a>
+        </div>
+    </div>
+                
+                <!-- Team Member 2 -->
+                <div class="text-center fade-in-up team-member">
+                    <img class="w-24 sm:w-28 md:w-32 h-24 sm:h-28 md:h-32 mx-auto rounded-full object-cover mb-3 sm:mb-4 shadow-md" src="images/photo_2025-08-24_14-55-47.jpg" alt="Augutin Habte">
+                    <h3 class="text-lg sm:text-xl font-bold text-gray-900">Augustin Habte</h3>
+                    <p class="text-gray-600 mb-1 sm:mb-2">Advisor & EOTC-based Content Writer</p>
+                    <p class="text-sm text-gray-500 mb-2 sm:mb-4">Expert in developing engaging narratives with cultural and spiritual depth, Maintains a consistent and compelling narrative tone across all projects, ensuring cultural authenticity.</p>
+                    <div class="flex justify-center space-x-3 sm:space-x-4">
+                        <a href="https://www.facebook.com/agustin.habte.2025" aria-label="Facebook profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                        </a>
+                        <a href="https://www.linkedin.com/in/agustin-habte-320013381" aria-label="LinkedIn profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                        </a>
+                        <a href="https://www.instagram.com/agustinhabte?igsh=djIyM3M1Znl6YnEy" aria-label="Instagram profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                        </a>
+                        <a href="https://www.tiktok.com/@agustin.habte?_t=ZM-8z7hD0lclW9&_r=1" aria-label="TikTok profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12a4 4 0 1 0 4-4 4 4 0 0 0-4 4zm0 0v6a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2v-2"></path><path d="M12 10v6"></path><path d="M12 8h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-3"></path><path d="M19 8V6a2 2 0 0 0-2-2h-2"></path></svg>
+                        </a>
+                        <a href="http://t.me/Aagape12" aria-label="Telegram profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 17-5-4-3 2-3-10 13-5z"></path></svg>
+                        </a>
+                    </div>
+                     <div class="mt-4">
+            <a href="https://www.tiktok.com/@agustin.habte?_t=ZM-8z7hD0lclW9&_r=1" aria-label="Visit my portfolio" class="inline-flex items-center bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 px-4 sm:px-6 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button">
+                Visit my portfolio
+            </a>
+        </div>
+                </div>
+            </div>
+        </div>
+</section>
+<!-- Contact & FAQ Section -->
+<section id="contact" class="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-gray-50 to-white">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-6 sm:mb-8 md:mb-12 fade-in-up">Contact & Support</h2>
+        <div class="max-w-md sm:max-w-lg md:max-w-xl mx-auto space-y-8 sm:space-y-12">
+            <!-- Contact Form -->
+            <div class="fade-in-up flex justify-center">
+                <form action="https://formspree.io/f/myzpqybo" method="POST" class="space-y-4 sm:space-y-6 w-full max-w-xs">
+                    <div>
+                        <label for="email" class="block text-gray-700 font-semibold mb-1 sm:mb-2">Your Email</label>
+                        <input type="email" id="email" name="email" class="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 transition text-sm sm:text-base" required>
+                    </div>
+                    <div>
+                        <label for="message" class="block text-gray-700 font-semibold mb-1 sm:mb-2">Your Message</label>
+                        <textarea id="message" name="message" rows="3" class="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 transition text-sm sm:text-base" required></textarea>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="bg-gradient-to-r from-gray-900 to-gray-700 text-white font-bold py-2 sm:py-3 px-6 sm:px-10 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 text-sm sm:text-base cta-button">Send</button>
+                    </div>
+                    <input type="hidden" name="_cc" value="fieshatech@gmail.com">
+                </form>
+            </div>
+            <!-- FAQ Section -->
+            <div class="fade-in-up">
+                <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">Frequently Asked Questions</h3>
+                <div class="space-y-3 sm:space-y-4">
+                    <div class="faq-item">
+                        <details>
+                            <summary class="font-semibold text-gray-800 text-sm sm:text-base">What types of content do you specialize in?</summary>
+                            <div class="mt-2 p-3 sm:p-4 rounded-b-lg text-gray-600 text-sm sm:text-base">We offer Tech related Content, EOTC Spiritual Content, and Business Content for various needs.</div>
+                        </details>
+                    </div>
+                    <div class="faq-item">
+                        <details>
+                            <summary class="font-semibold text-gray-800 text-sm sm:text-base">How do I place an order?</summary>
+                            <div class="mt-2 p-3 sm:p-4 rounded-b-lg text-gray-600 text-sm sm:text-base">Fill out the Google Form in the Order section, and we’ll contact you via telegram username or email as soon as possible with in 24 hours. So, Check you telegram account after submitting the form.</div>
+                        </details>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <details>
+                            <summary class="font-semibold text-gray-800 text-sm sm:text-base">What is the payment process?</summary>
+                            <div class="mt-2 p-3 sm:p-4 rounded-b-lg text-gray-600 text-sm sm:text-base">Payment details are provided via your telegram username or email after we discuss your project.</div>
+                        </details>
+                    </div>
+                     <div class="faq-item">
+                        <details>
+                            <summary class="font-semibold text-gray-800 text-sm sm:text-base">Do you develop software products?</summary>
+                            <div class="mt-2 p-3 sm:p-4 rounded-b-lg text-gray-600 text-sm sm:text-base">Yes, we develop custom software solutions tailored to your needs. Types of software we develop include custom Telegram bots, minimalistic web applications for now. Talk to Fisehatsion with the contacts above for more details.</div>
+                        </details>
+                    </div>
+                     <div class="faq-item">
+                        <details>
+                            <summary class="font-semibold text-gray-800 text-sm sm:text-base">Do you give short training on how to use AI for productivity?</summary>
+                            <div class="mt-2 p-3 sm:p-4 rounded-b-lg text-gray-600 text-sm sm:text-base">Yes, we offer short training sessions on using AI tools and techniques to enhance productivity.</div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>      
+
+    <!-- Footer -->
+   <footer class="bg-gradient-to-b from-gray-900 to-gray-800 text-white py-6 sm:py-8">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="mb-4 sm:mb-6 flex justify-center">
+                <a href="https://t.me/behabeshawi_kana_support_center" aria-label="Join us on Telegram" class="inline-flex items-center bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-3 px-6 sm:px-8 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button w-full sm:w-auto max-w-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2"><path d="M21 2l-2 17-5-4-3 2-3-10 13-5z"></path></svg>
+                    Join us on Telegram
+                </a>
+            </div>
+            <p class="text-sm sm:text-base">&copy; 2025 Behabeshawikana. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Chatbot Modal -->
+    <div id="chatbot-modal" class="hidden">
+        <div class="chat-window">
+            <div class="chat-header bg-gradient-to-r from-gray-900 to-gray-700">
+                <h3 class="font-bold text-white text-sm sm:text-base">Behabeshawikana Bot</h3>
+                <button id="close-chatbot" class="text-white text-lg font-bold">&times;</button>
+            </div>
+            <div id="chat-body" class="chat-body">
+                <div class="message bot-message text-sm sm:text-base">Hello! How can I help you with our services today?</div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="chat-input" placeholder="Type your message..." class="flex-grow p-2 sm:p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm sm:text-base">
+                <button id="chat-send" class="bg-gradient-to-r from-gray-900 to-gray-700 text-white p-2 sm:p-3 rounded-lg hover:bg-gray-700 transition" title="Send message">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Smooth Scroll for Navigation
+        document.querySelectorAll('a[data-scroll]').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Animate on Scroll
+        const fadeElements = document.querySelectorAll('.fade-in-up');
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        fadeElements.forEach(element => observer.observe(element));
+
+        // Simple Chatbot Logic with Gemini API Integration
+        const chatbotModal = document.getElementById('chatbot-modal');
+        const closeChatbot = document.getElementById('close-chatbot');
+        const chatInput = document.getElementById('chat-input');
+        const chatSendBtn = document.getElementById('chat-send');
+        const chatBody = document.getElementById('chat-body');
+
+        // Gemini API key
+        const apiKey = 'AIzaSyBA8cTka--08_tUzujkqKQckz5YGZoC6i4';
+
+        // Gemini API endpoint
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+        // Chat history for context
+        let chatHistory = [{ role: "model", parts: [{ text: "Hello! Welcome to Behabeshawikana. How can I help you with our services today?" }] }];
+
+        // Static website content for context
+        const websiteContent = `
+Behabeshawikana offers expert script writing and content development for tech, business, EOTC spiritual, and other needs.
+
+About: Behabeshawikana transforms ideas into stories that captivate and inspire. Our diverse team creates authentic, high-quality content tailored to tech related, spiritual, and business needs. From research-driven tech content to meaningful EOTC spiritual works, we’re dedicated to delivering excellence.
+
+Services:
+- Tech Related Content: Clear, accurate, and engaging technical documentation, blogs, and articles for the tech industry.
+- EOTC Spiritual Contents: Uplifting content scripts based on Ethiopian Orthodox Tewahedo Church traditions.
+- Business Related Contents: Promotional scripts and ad copy to effectively reach your audience.
+
+Order: Fill out the Google Form at https://docs.google.com/forms/d/e/1FAIpQLSc_oZ-3MRfnn1w7rqSXk8leixjMI_8L94HihD8CFvJ8R0sDqQ/viewform to start your project. We’ll contact you via email or telegram to discuss details and handle payment securely.
+
+Team:
+- Fisehatsion Adisu: Lead Script Writer & Founder of Behabeshawikana. Over 1 year in scriptwriting and content creation. Social links: Facebook https://www.facebook.com/dfisa.adisu, LinkedIn https://www.linkedin.com/in/fisehatsion-adisu-abute-929279208, Instagram https://www.instagram.com/dfisaadisu?igsh=YzljYTk1ODg3Zg==, TikTok https://vm.tiktok.com/ZMAFrYpFy/, Telegram https://t.me/fisiha1224.
+- Augustin Habte: Advisor & EOTC-based Content Writer. Expert in developing engaging narratives with cultural and spiritual depth. Social links: Facebook https://www.facebook.com/agustin.habte.2025, LinkedIn #, Instagram https://instagram.com/agustinhabte?igsh=djIyM3M1Znl6YnEy, TikTok https://www.tiktok.com/@agustin.habte?_t=ZM-8z7hD0lclW9&_r=1, Telegram http://t.me/Aagape12.
+
+Contact: Use the form to send email and message. FAQs: Specialize in tech, EOTC, business content. Place order via form, contact within 24 hours. Payment details via telegram or email.
+        `;
+
+        function addMessage(text, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
+            messageDiv.textContent = text;
+            chatBody.appendChild(messageDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const userMessage = chatInput.value.trim();
+            if (!userMessage) return;
+
+            addMessage(userMessage, true);
+            chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
+            chatInput.value = '';
+
+            // System prompt with website content
+            const systemPrompt = `You are a helpful chatbot for Behabeshawikana website. Use the following website content to answer questions accurately: ${websiteContent}. Focus on simple questions about services, order, team, etc. If the question is unrelated, politely redirect to website topics.`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contents: [
+                            { role: "model", parts: [{ text: systemPrompt }] },
+                            ...chatHistory
+                        ]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
+
+                const data = await response.json();
+                const botResponse = data.candidates[0].content.parts[0].text;
+                addMessage(botResponse);
+                chatHistory.push({ role: "model", parts: [{ text: botResponse }] });
+            } catch (error) {
+                addMessage('Sorry, there was an error connecting to the AI service. Please try again later.');
+                console.error(error);
+            }
+        }
+
+        chatSendBtn.addEventListener('click', sendMessage);
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        closeChatbot.addEventListener('click', () => {
+            chatbotModal.style.display = 'none';
+        });
+
+        // Chatbot Open Button
+        const chatOpenButton = document.createElement('button');
+        chatOpenButton.id = 'open-chatbot';
+        chatOpenButton.className = 'fixed bottom-6 right-6 p-4 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 z-50';
+        chatOpenButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>`;
+        document.body.appendChild(chatOpenButton);
+        chatOpenButton.addEventListener('click', () => {
+            chatbotModal.style.display = 'flex';
+        });
+
+        // Preloader
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('preloader');
+            setTimeout(() => {
+                preloader.classList.add('hidden');
+            }, 1000);
+        });
+
+        // Back to Top Button
+        const backToTop = document.getElementById('back-to-top');
+        if (backToTop) {
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 300) {
+                    backToTop.classList.remove('hidden');
+                    backToTop.classList.add('visible');
+                } else {
+                    backToTop.classList.add('hidden');
+                    backToTop.classList.remove('visible');
+                }
+            });
+            backToTop.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        }
+
+        // Toggle Mobile Menu
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenuToggle && mobileMenu) {
+            mobileMenuToggle.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!mobileMenuToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
