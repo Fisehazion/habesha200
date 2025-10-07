@@ -9,16 +9,19 @@
     <!-- Open Graph Tags for Social Media -->
     <meta property="og:title" content="Behabeshawikana - Script Writing & Content Development">
     <meta property="og:description" content="Expert scriptwriting for EOTC spiritual content, tech, and business narratives. Order your custom script today!">
-    <meta property="og:image" content="images/ChatGPT Image Aug 28, 2025, 11_33_43 PM.png">
+    <meta property="og:image" content="images/ChatGPT Image Aug 28, 2025, 11_33_43 PM.webp">
     <meta property="og:url" content="https://behabeshawikana.netlify.app/">
     <meta property="og:type" content="website">
     <title>Behabeshawikana - Script Writing & Content Development Platform</title>
     <!-- Favicon -->
-    <link rel="icon" type="images/jpg" href="images/ChatGPT Image Aug 28, 2025, 11_33_43 PM.png">
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/webp" href="images/ChatGPT Image Aug 28, 2025, 11_33_43 PM.webp">
+    <!-- Preload critical CSS -->
+    <link rel="preload" href="https://cdn.tailwindcss.com" as="script">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" as="style">
+    <!-- Defer non-critical CSS -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+    <!-- Tailwind CSS CDN (defer loading) -->
+    <script defer src="https://cdn.tailwindcss.com"></script>
     <!-- Custom CSS -->
     <style>
         /* Original inline styles */
@@ -92,7 +95,7 @@
 
         /* Hero Background */
         .hero-bg {
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('images/Gemini_Generated_Image_stieudstieudstie.png');
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('images/Gemini_Generated_Image_stieudstieudstie.webp');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -272,7 +275,7 @@
             100% { background-position: 0% 50%; }
         }
         .hero-bg {
-            background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.4)), url('images/Gemini_Generated_Image_stieudstieudstie.png');
+            background: linear-gradient(135deg, rgba(0,0,0,0.7), rgba(0,0,0,0.4)), url('images/Gemini_Generated_Image_stieudstieudstie.webp');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -406,7 +409,7 @@
         "@type": "Organization",
         "name": "Behabeshawikana",
         "url": "https://behabeshawikana.netlify.app/",
-        "logo": "images/ChatGPT Image Aug 28, 2025, 11_33_43 PM.png"
+        "logo": "images/ChatGPT_Image_Aug_28_2025_11_33_43_PM.webp"
       },
       "areaServed": {
         "@type": "Country",
@@ -433,7 +436,7 @@
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-3 flex items-center relative">
             <!-- Logo on the left -->
             <div class="logo-container flex items-center mr-4">
-                <img src="images/ChatGPT Image Aug 28, 2025, 11_33_43 PM.png" alt="Behabeshawi-Kana Logo" class="h-6 sm:h-8 md:h-10 w-12 sm:w-16 md:w-20 object-contain" loading="lazy">
+                <img src="images/ChatGPT Image Aug 28, 2025, 11_33_43 PM.webp" alt="Behabeshawi-Kana Logo" class="h-6 sm:h-8 md:h-10 w-12 sm:w-16 md:w-20 object-contain" loading="lazy" width="80" height="40">
             </div>
             <div class="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900">Behabeshawi-Kana</div>
             <div class="flex items-center ml-auto">
@@ -549,7 +552,6 @@
                 <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-6 sm:mb-8 md:mb-12 fade-in-up">Our Script Samples</h2>
                 <p class="text-base sm:text-lg text-gray-700 text-center max-w-xl sm:max-w-2xl md:max-w-3xl mx-auto mb-8 sm:mb-12 leading-relaxed">Explore our sample scripts to see the quality and creativity we bring to Tech, Business and EOTC content. Ready to start your project? Order now!</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                    
                     <!-- Tech Sample -->
                     <div class="portfolio-card fade-in-up">
                         <h3 class="text-lg sm:text-xl font-semibold text-center mb-2 sm:mb-4 text-gray-900">Tech Script</h3>
@@ -559,7 +561,6 @@
                             <a href="#order" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base" data-scroll>Order Tech Script</a>
                         </div>
                     </div>
-                    
                     <!-- Business Sample -->
                     <div class="portfolio-card fade-in-up">
                         <h3 class="text-lg sm:text-xl font-semibold text-center mb-2 sm:mb-4 text-gray-900">Business Script</h3>
@@ -603,7 +604,7 @@
                     <div class="team-grid grid grid-cols-1 md:grid-cols-2 gap-8 auto-rows-auto max-w-5xl w-full px-4">
                         <!-- Team Member 1 -->
                         <div class="text-center fade-in-up team-member">
-                            <img class="w-24 sm:w-28 md:w-32 h-24 sm:h-28 md:h-32 mx-auto rounded-full object-cover mb-3 sm:mb-4 shadow-md" src="images/photo_2024-01-12_13-44-25.jpg" alt="Fisehatsion Adisu, Lead Script Writer" loading="lazy">
+                            <img class="w-24 sm:w-28 md:w-32 h-24 sm:h-28 md:h-32 mx-auto rounded-full object-cover mb-3 sm:mb-4 shadow-md" src="images/photo_2024-01-12_13-44-25.webp" alt="Fisehatsion Adisu, Lead Script Writer" loading="lazy" width="128" height="128">
                             <h3 class="text-lg sm:text-xl font-bold text-gray-900">Fisehatsion Adisu</h3>
                             <p class="text-gray-600 mb-1 sm:mb-2">Lead Script Writer & Founder of Behabeshawikana</p>
                             <p class="text-sm text-gray-500 mb-2 sm:mb-4">Over 1 year in scriptwriting and content creation, specializing in character-driven storytelling. I’ve written 9+ successful YouTube video scripts, all production-ready and produced. As the lead script writer at Behabeshawikana, I ensure every script aligns with the brand vision and delivers high-quality, engaging content. Passionate about authentic storytelling that connects and inspires.</p>
@@ -632,7 +633,7 @@
                         </div>
                         <!-- Team Member 2 -->
                         <div class="text-center fade-in-up team-member">
-                            <img class="w-24 sm:w-28 md:w-32 h-24 sm:h-28 md:h-32 mx-auto rounded-full object-cover mb-3 sm:mb-4 shadow-md" src="images/photo_2025-08-24_14-55-47.jpg" alt="Augustin Habte, EOTC Content Writer" loading="lazy">
+                            <img class="w-24 sm:w-28 md:w-32 h-24 sm:h-28 md:h-32 mx-auto rounded-full object-cover mb-3 sm:mb-4 shadow-md" src="images/photo_2025-08-24_14-55-47.webp" alt="Augustin Habte, EOTC Content Writer" loading="lazy" width="128" height="128">
                             <h3 class="text-lg sm:text-xl font-bold text-gray-900">Augustin Habte</h3>
                             <p class="text-gray-600 mb-1 sm:mb-2">Advisor & EOTC-based Content Writer</p>
                             <p class="text-sm text-gray-500 mb-2 sm:mb-4">Expert in developing engaging narratives with cultural and spiritual depth, Maintains a consistent and compelling narrative tone across all projects, ensuring cultural authenticity.</p>
@@ -759,7 +760,7 @@
         </div>
 
         <!-- JavaScript -->
-        <script>
+        <script defer>
             // Smooth Scroll for Navigation
             document.querySelectorAll('a[data-scroll]').forEach(link => {
                 link.addEventListener('click', (e) => {
@@ -903,26 +904,6 @@ Contact: Use the form to send email and message. FAQs: Specialize in tech, EOTC,
                     preloader.classList.add('hidden');
                 }, 1000);
             });
-
-            // Back to Top Button
-            const backToTop = document.getElementById('back-to-top');
-            if (backToTop) {
-                window.addEventListener('scroll', () => {
-                    if (window.scrollY > 300) {
-                        backToTop.classList.remove('hidden');
-                        backToTop.classList.add('visible');
-                    } else {
-                        backToTop.classList.add('hidden');
-                        backToTop.classList.remove('visible');
-                    }
-                });
-                backToTop.addEventListener('click', () => {
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                });
-            }
 
             // Toggle Mobile Menu
             const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
