@@ -424,9 +424,7 @@
 </head>
 <body>
     <!-- Preloader -->
-    <div id="preloader" class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
-        <div class="loader"></div>
-    </div>
+ 
 
     <!-- Header -->
     <header class="bg-white shadow-lg sticky top-0 z-40">
@@ -896,13 +894,6 @@ Contact: Use the form to send email and message. FAQs: Specialize in tech, EOTC,
                 chatbotModal.style.display = 'flex';
             });
 
-            // Preloader
-            window.addEventListener('load', () => {
-                const preloader = document.getElementById('preloader');
-                setTimeout(() => {
-                    preloader.classList.add('hidden');
-                }, 1000);
-            });
 
             // Back to Top Button
             const backToTop = document.getElementById('back-to-top');
