@@ -6,16 +6,17 @@
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-  <script src="https://unpkg.com/decap-cms@^3.3.0/dist/decap-cms.js"></script>
+  <!-- This version is 100% stable with Netlify + Git Gateway -->
+  <script src="https://unpkg.com/decap-cms@2.10.192/dist/decap-cms.js"></script>
 
   <script>
-    window.CMS_MANUAL_INIT = true;
-
-    CMS.init({
+    window.CMS.init({
       config: {
-        backend: { name: "git-gateway", branch: "main" },
-        local_backend: true,
-        media_folder: "/images/uploads",
+        backend: {
+          name: "git-gateway",
+          branch: "main"
+        },
+        media_folder: "images/uploads",
         public_folder: "/images/uploads",
         collections: [
           {
