@@ -7,10 +7,19 @@
 </head>
 <body>
   <script type="module">
-    // CHANGED FROM UNPKG TO JSDELIVR TO FIX CORS ERROR
+    // Using jsDelivr to avoid CORS errors
     import SveltiaCMS from 'https://cdn.jsdelivr.net/npm/sveltia-cms@1.9.1/dist/sveltia-cms.js';
     SveltiaCMS({
-      backend: { name: 'github', repo: 'Fisehazion/habesha200', branch: 'main' },
+      // --- THIS IS THE CRITICAL CHANGE ---
+      // We switch from the OAuth login to direct token access to fix the 404/permission errors.
+      backend: { 
+        name: 'github', 
+        repo: 'Fisehazion/habesha200', 
+        branch: 'main',
+        // PASTE YOUR GENERATED TOKEN HERE (Keep it SECRET!)
+        token: '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' 
+      },
+      // ------------------------------------
       media_folder: 'images/uploads',
       public_folder: '/images/uploads',
       collections: [
