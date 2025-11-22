@@ -1,6 +1,5 @@
 [build]
   publish = "."
-  # This tiny real command forces Netlify to clear ALL cache every deploy
   command = "echo 'Build complete'"
 
 [[redirects]]
@@ -13,7 +12,7 @@
   to = "/static/admin/:splat"
   status = 200
 
-# Optional – only if you ever go back to config.yml
+# Optional only if you ever add config.yml later
 [[redirects]]
   from = "/admin/config.yml"
   to = "/static/admin/config.yml"
