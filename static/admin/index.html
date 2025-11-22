@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Sveltia CMS</title>
+  <link rel="icon" href="data:,">
+</head>
+<body>
+  <script type="module">
+    import SveltiaCMS from 'https://unpkg.com/sveltia-cms@1.9.1/dist/sveltia-cms.js';
+    SveltiaCMS({
+      backend: { name: 'github', repo: 'Fisehazion/habesha200', branch: 'main' },
+      media_folder: 'images/uploads',
+      public_folder: '/images/uploads',
+      collections: [
+        {
+          name: 'blog',
+          label: 'Blog Posts',
+          folder: 'content/blog',
+          create: true,
+          slug: '{{year}}-{{month}}-{{day}}-{{slug}}',
+          fields: [
+            { label: 'Title', name: 'title', widget: 'string' },
+            { label: 'Date', name: 'date', widget: 'datetime' },
+            { label: 'Excerpt', name: 'excerpt', widget: 'text' },
+            { label: 'Body',name: 'body', widget: 'markdown' },
+{ label: 'YouTube Link', name: 'video_link', widget: 'string', required: false }
+]
+}
+]
+});
+</script>
