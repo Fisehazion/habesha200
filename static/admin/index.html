@@ -4,33 +4,21 @@
   <meta charset="utf-8">
   <title>Sveltia CMS</title>
   <link rel="icon" href="data:,">
-
-  <!-- Netlify injects environment variables here -->
-  <script>
-    window.ENV = {
-      GITHUB_TOKEN: "{{GITHUB_TOKEN}}"
-    };
-  </script>
 </head>
 <body>
   <script type="module">
-    // Load Sveltia CMS from official CDN
-    import SveltiaCMS from 'https://unpkg.com/sveltia-cms/dist/sveltia-cms.js';
-
-    // Secure token provided by Netlify during deployment
-    const token = window?.ENV?.GITHUB_TOKEN || null;
+    // Use jsDelivr with version to avoid 404 + CORS
+    import SveltiaCMS from 'https://cdn.jsdelivr.net/npm/sveltia-cms@0.4.0/dist/sveltia-cms.min.js';
 
     SveltiaCMS({
       backend: {
         name: 'github',
         repo: 'Fisehazion/habesha200',
         branch: 'main',
-        token: token
+        token: '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' // replace this
       },
-
       media_folder: 'images/uploads',
       public_folder: '/images/uploads',
-
       collections: [
         {
           name: 'blog',

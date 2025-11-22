@@ -11,10 +11,3 @@
   from = "/admin/*"
   to = "/static/admin/:splat"
   status = 200
-
-# Optional only if you ever add config.yml later
-[[redirects]]
-  from = "/admin/config.yml"
-  to = "/static/admin/config.yml"
-  status = 200
-  force = true
