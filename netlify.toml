@@ -1,0 +1,21 @@
+[build]
+  publish = "."
+  command = "echo No build needed"
+
+# Serve the entire /static/admin folder correctly
+[[redirects]]
+  from = "/admin"
+  to = "/static/admin/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin/*"
+  to = "/static/admin/:splat"
+  status = 200
+
+# This line fixes config.yml 404 FOREVER (local + live)
+[[redirects]]
+  from = "/admin/config.yml"
+  to = "/static/admin/config.yml"
+  status = 200
+  force = true
