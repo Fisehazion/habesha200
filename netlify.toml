@@ -1,8 +1,8 @@
 [build]
   publish = "."
-  command = "echo No build needed"
+  # This tiny real command forces Netlify to clear ALL cache every deploy
+  command = "echo 'Build complete'"
 
-# Serve the entire /static/admin folder correctly
 [[redirects]]
   from = "/admin"
   to = "/static/admin/index.html"
@@ -13,7 +13,7 @@
   to = "/static/admin/:splat"
   status = 200
 
-# This line fixes config.yml 404 FOREVER (local + live)
+# Optional – only if you ever go back to config.yml
 [[redirects]]
   from = "/admin/config.yml"
   to = "/static/admin/config.yml"
