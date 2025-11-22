@@ -575,55 +575,66 @@ Contact: Use the form to send email and message. FAQs: Specialize in tech, EOTC,
 // YOUR ALL ORIGINAL JS (smooth scroll, chatbot, mobile menu, etc.) stays exactly the same
 
 // NEW BLOG CODE – ADD AT THE END
-const REPO_OWNER = "YOUR_GITHUB_USERNAME";   // ← CHANGE THIS
-const REPO_NAME   = "YOUR_REPO_NAME";        // ← CHANGE THIS
+// Blog Rendering (updated for better error handling)
+const REPO_OWNER = "Fisehazion";  // Your GitHub username
+const REPO_NAME = "habesha200";   // Your repo name (confirmed from GitHub)
 
 async function loadBlogPosts() {
-    try {
-        const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/content/blog`);
-        if (!res.ok) throw new Error("API error");
-        const files = await res.json();
-        const mdFiles = files.filter(f => f.name.endsWith('.md')).sort((a,b) => b.name.localeCompare(a.name));
-        const container = document.getElementById('blog-posts');
-
-        if (mdFiles.length === 0) {
-            container.innerHTML = '<p class="col-span-full text-center text-gray-600 text-xl">No posts yet – coming soon!</p>';
-            return;
-        }
-
-        mdFiles.forEach(file => {
-            const card = document.createElement('div');
-            card.className = "bg-gray-100 p-8 rounded-2xl shadow-lg hover:scale-105 transition transform cursor-pointer fade-in-up";
-            card.innerHTML = `<h3 class="text-2xl font-bold text-center mb-4 text-gray-900">${file.name.replace('.md','').replace(/-/g,' ')}</h3>
-                              <p class="text-center text-gray-600">Click to read →</p>`;
-            card.onclick = () => showPost(file.download_url);
-            container.appendChild(card);
-        });
-    } catch (e) {
-        document.getElementById('blog-posts').innerHTML = '<p class="col-span-full text-center text-red-600">Error loading blog posts</p>';
+  try {
+    const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/content/blog`);
+    if (!res.ok) {
+      throw new Error(`API error: ${res.status} - ${res.statusText}`);
     }
+    const files = await res.json();
+    const mdFiles = files.filter(f => f.name.endsWith('.md')).sort((a, b) => b.name.localeCompare(a.name));
+    const container = document.getElementById('blog-posts');
+
+    if (mdFiles.length === 0) {
+      container.innerHTML = '<p class="col-span-full text-center text-gray-600 text-xl py-8">No posts yet – check back soon for fresh insights on scripts and content!</p>';
+      return;
+    }
+
+    mdFiles.forEach(file => {
+      const card = document.createElement('div');
+      card.className = "bg-gray-100 p-8 rounded-2xl shadow-lg hover:scale-105 transition transform cursor-pointer fade-in-up";
+      card.innerHTML = `<h3 class="text-2xl font-bold text-center mb-4 text-gray-900">${file.name.replace('.md', '').replace(/-/g, ' ')}</h3>
+                        <p class="text-center text-gray-600">Click to read →</p>`;
+      card.onclick = () => showPost(file.download_url);
+      container.appendChild(card);
+    });
+  } catch (e) {
+    console.error('Blog load error:', e);  // Logs to console for debugging
+    document.getElementById('blog-posts').innerHTML = '<p class="col-span-full text-center text-red-600 py-8">Error loading blog posts. Check console for details or refresh the page.</p>';
+  }
 }
 
 async function showPost(url) {
+  try {
     const md = await (await fetch(url)).text();
-    const html = marked.parse(md.replace(/^---[\s\S]*?---/, '')); // strip frontmatter
+    const html = marked.parse(md.replace(/^---[\s\S]*?---/, '')); // Strip frontmatter
     const videoMatch = md.match(/video_link:\s*(.+)/);
     const videoEmbed = videoMatch ? `<div class="my-10"><iframe width="100%" height="400" src="${videoMatch[1].replace('watch?v=', 'embed/')}" frameborder="0" allowfullscreen class="rounded-xl"></iframe></div>` : '';
 
     document.getElementById('blog-detail').innerHTML = `
-        <button onclick="backToList()" class="mb-8 text-blue-600 font-bold text-lg">&larr; Back to Blog</button>
-        ${videoEmbed}
-        <article class="leading-relaxed">${html}</article>
+      <button onclick="backToList()" class="mb-8 text-blue-600 font-bold text-lg">&larr; Back to Blog</button>
+      ${videoEmbed}
+      <article class="leading-relaxed">${html}</article>
     `;
     document.getElementById('blog-posts').classList.add('hidden');
     document.getElementById('blog-detail').classList.remove('hidden');
     window.scrollTo(0, 0);
-}
-function backToList() {
-    document.getElementById('blog-detail').classList.add('hidden');
-    document.getElementById('blog-posts').classList.remove('hidden');
+  } catch (e) {
+    console.error('Post load error:', e);
+    document.getElementById('blog-detail').innerHTML = '<p class="text-red-600">Error loading post. Try again.</p>';
+  }
 }
 
+function backToList() {
+  document.getElementById('blog-detail').classList.add('hidden');
+  document.getElementById('blog-posts').classList.remove('hidden');
+}
+
+// Lazy-load on scroll
 new IntersectionObserver(e => { if (e[0].isIntersecting) loadBlogPosts(); }).observe(document.getElementById('blog'));
 </script>
 
