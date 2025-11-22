@@ -7,8 +7,8 @@
 </head>
 <body>
   <script type="module">
-    // FIX: Updated CDN link to use the minimized version and a slightly newer version
-    import SveltiaCMS from 'https://cdn.jsdelivr.net/npm/sveltia-cms@1.9.2/dist/sveltia-cms.min.js';
+    // FIX: Using a version-less link for the Sveltia CMS file to avoid 404 errors due to versioning issues.
+    import SveltiaCMS from 'https://cdn.jsdelivr.net/npm/sveltia-cms/dist/sveltia-cms.min.js';
     SveltiaCMS({
       // --- CRITICAL CONFIGURATION (Using PAT to bypass login) ---
       backend: { 
