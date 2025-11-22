@@ -6,36 +6,44 @@
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-  <!-- This version is 100% stable with Netlify + Git Gateway -->
   <script src="https://unpkg.com/decap-cms@2.10.192/dist/decap-cms.js"></script>
-
   <script>
-    window.CMS.init({
-      config: {
-        backend: {
-          name: "git-gateway",
-          branch: "main"
-        },
-        media_folder: "images/uploads",
-        public_folder: "/images/uploads",
-        collections: [
-          {
-            name: "blog",
-            label: "Blog Posts",
-            folder: "content/blog",
-            create: true,
-            slug: "{{year}}-{{month}}-{{day}}-{{slug}}",
-            fields: [
-              { label: "Title", name: "title", widget: "string" },
-              { label: "Date", name: "date", widget: "datetime" },
-              { label: "Excerpt", name: "excerpt", widget: "text" },
-              { label: "Body", name: "body", widget: "markdown" },
-              { label: "YouTube Link", name: "video_link", widget: "string", required: false }
-            ]
-          }
-        ]
+    // Wait for Identity to load, then init CMS
+    window.netlifyIdentity ? initCMS() : netlifyIdentity.on('init', initCMS);
+
+    function initCMS() {
+      window.CMS.init({
+        config: {
+          backend: { name: "git-gateway", branch: "main" },
+          media_folder: "images/uploads",
+          public_folder: "/images/uploads",
+          collections: [
+            {
+              name: "blog",
+              label: "Blog Posts",
+              folder: "content/blog",
+              create: true,
+              slug: "{{year}}-{{month}}-{{day}}-{{slug}}",
+              fields: [
+                { label: "Title", name: "title", widget: "string" },
+                { label: "Date", name: "date", widget: "datetime" },
+                { label: "Excerpt", name: "excerpt", widget: "text" },
+                { label: "Body", name: "body", widget: "markdown" },
+                { label: "YouTube Link", name: "video_link", widget: "string", required: false }
+              ]
+            }
+          ]
+        }
+      });
+    }
+
+    // Fallback if no init after 5 seconds
+    setTimeout(() => {
+      if (!window.CMS) {
+        document.body.innerHTML = '<p style="text-align:center; padding:20px;">Loading dashboard... If stuck, refresh or check console.</p>';
+        console.error('CMS init timeout');
       }
-    });
+    }, 5000);
   </script>
 </body>
 </html>
