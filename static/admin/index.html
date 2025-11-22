@@ -7,19 +7,18 @@
 </head>
 <body>
   <script type="module">
-    // Using jsDelivr to avoid CORS errors
-    import SveltiaCMS from 'https://cdn.jsdelivr.net/npm/sveltia-cms@1.9.1/dist/sveltia-cms.js';
+    // FIX: Updated CDN link to use the minimized version and a slightly newer version
+    import SveltiaCMS from 'https://cdn.jsdelivr.net/npm/sveltia-cms@1.9.2/dist/sveltia-cms.min.js';
     SveltiaCMS({
-      // --- THIS IS THE CRITICAL CHANGE ---
-      // We switch from the OAuth login to direct token access to fix the 404/permission errors.
+      // --- CRITICAL CONFIGURATION (Using PAT to bypass login) ---
       backend: { 
         name: 'github', 
         repo: 'Fisehazion/habesha200', 
         branch: 'main',
-        // PASTE YOUR GENERATED TOKEN HERE (Keep it SECRET!)
+        // IMPORTANT: PASTE YOUR GENERATED PERSONAL ACCESS TOKEN HERE
         token: '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' 
       },
-      // ------------------------------------
+      // -----------------------------------------------------------
       media_folder: 'images/uploads',
       public_folder: '/images/uploads',
       collections: [
