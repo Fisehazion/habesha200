@@ -9,7 +9,11 @@
 <body>
   <div id="app" style="padding:20px;text-align:center;color:#666;">Loading CMS Dashboard...</div>
   <script src="https://unpkg.com/decap-cms@^2.0.0/dist/decap-cms.js"></script>
-  <script>
+ <script>
+  // Decap CMS CDN (stable)
+  const script = document.createElement('script');
+  script.src = 'https://unpkg.com/decap-cms@^2.0.0/dist/decap-cms.js';
+  script.onload = function() {
     CMS.init({
       config: {
         backend: {
@@ -31,15 +35,23 @@
             { label: 'Excerpt', name: 'excerpt', widget: 'text' },
             { label: 'Featured Image', name: 'image', widget: 'image' },
             { label: 'YouTube ID', name: 'youtube', widget: 'string', hint: 'e.g. dQw4w9WgXcQ' },
-            { label: 'Body', name: 'body', widget: 'markdown', options: { brecht: { preview: false } } }
+            { label: 'Body', name: 'body', widget: 'markdown' }
           ]
         }]
       }
     });
+    
+    // Force Identity login prompt
     netlifyIdentity.on('init', user => {
-      if (!user) netlifyIdentity.open();
+      if (!user) {
+        setTimeout(() => netlifyIdentity.open('login'), 500);  // Delay to ensure ready
+      } else {
+        document.getElementById('app').innerHTML = '<h2>Logged in! Dashboard loading...</h2>';
+      }
     });
     netlifyIdentity.init();
-  </script>
+  };
+  document.head.appendChild(script);
+</script>
 </body>
 </html>
