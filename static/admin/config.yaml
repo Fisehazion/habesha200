@@ -2,30 +2,19 @@ backend:
   name: git-gateway
   branch: main
 
-media_folder: "images/uploads"
+media_folder: "/images/uploads"
 public_folder: "/images/uploads"
 
-site_url: https://behabeshawikana.netlify.app
-
 collections:
-  - name: "blog"
-    label: "Blog Posts"
-    folder: "content/blog"
+  - name: blog
+    label: Blog Posts
+    folder: content/blog
     create: true
-    slug: "{{slug}}"
-    extension: "md"
-    format: "frontmatter"
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
     fields:
       - { label: "Title", name: "title", widget: "string" }
-      - { label: "Publish Date", name: "date", widget: "datetime", default: "" }
+      - { label: "Date", name: "date", widget: "datetime" }
       - { label: "Excerpt", name: "excerpt", widget: "text" }
-      - { label: "Featured Image", name: "image", widget: "image" }
-      - { label: "YouTube ID", name: "youtube", widget: "string", hint: "e.g. dQw4w9WgXcQ" }
-      - label: "Body"
-        name: "body"
-        widget: "markdown"
-        editor_components: [heading, bold, italic, link, image, youtube]
-        buttons: [bold, italic, link, image, heading-1, heading-2]
-        modes: [rich_text]
-        formats: [bold, italic, underline, forecolor, backcolor, fontname, fontsize]
-        fonts: ["Playfair Display", "Roboto", "Dancing Script", "Great Vibes"]
+      - { label: "Image", name: "image", widget: "image" }
+      - { label: "YouTube ID", name: "youtube", widget: "string", required: false }
+      - { label: "Body", name: "body", widget: "markdown" }

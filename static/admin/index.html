@@ -1,30 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="utf-8">
-  <title>Behabeshawikana CMS</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Netlify Identity (needed for login) -->
+  <title>CMS</title>
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
 
-<!-- Sveltia CMS – stable version that never 404s -->
 <script type="module">
-  import SveltiaCMS from 'https://cdn.jsdelivr.net/npm/sveltia-cms@0.4.0/dist/sveltia-cms.js';
-  import yaml from 'https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js';
+  import SveltiaCMS from 'https://cdn.jsdelivr.net/npm/sveltia-cms@0.4.0/dist/sveltia-cms.js/+esm';
+  import { load } from 'https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs';
 
-  // Load your config
   fetch('/admin/config.yml')
     .then(r => r.text())
-    .then(text => {
-      const config = yaml.load(text);
-      // Start Sveltia CMS
-      SveltiaCMS({ config });
-    })
-    .catch(err => {
-      document.body.innerHTML = `<h1 style="color:red; text-align:center; margin-top:100px;">
-        Error loading config.yml<br><br>${err}</h1>`;
+    .then(text => SveltiaCMS({ config: load(text) }))
+    .catch(() => {
+      document.body.innerHTML = '<h1 style="color:red;text-align:center;margin-top:100px">config.yml not found – check path</h1>';
     });
 </script>
 
