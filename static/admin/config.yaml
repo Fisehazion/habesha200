@@ -1,0 +1,80 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+local_backend: true
+
+site_url: https://behabeshawikana.netlify.app/  # CHANGE TO YOUR DOMAIN
+
+collections:
+  - name: "blog"
+    label: "Blog Posts"
+    folder: "content/blog"
+    create: true
+    slug: "{{slug}}"
+    extension: "md"
+    format: "frontmatter"
+    identifier_field: "title"
+    summary: "{{title}} — {{date}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Publish Date", name: "date", widget: "datetime", default: "", format: "YYYY-MM-DD" }
+      - { label: "Excerpt", name: "excerpt", widget: "text", required: false }
+      - { label: "Featured Image", name: "image", widget: "image", required: false }
+      - { label: "YouTube Video ID (optional)", name: "youtube", widget: "string", required: false, hint: "e.g. dQw4w9WgXcQ" }
+      - label: "Body"
+        name: "body"
+        widget: "markdown"
+        required: true
+        editor_components:
+          - heading
+          - bold
+          - italic
+          - code
+          - link
+          - bulleted-list
+          - numbered-list
+          - image
+          - quote
+          - youtube
+        buttons:
+          - bold
+          - italic
+          - code
+          - link
+          - bulleted-list
+          - numbered-list
+          - heading-1
+          - heading-2
+          - heading-3
+        modes: rich_text
+        toolbar:
+          - bold
+          - italic
+          - link
+          - image
+          - youtube
+          - format
+          - undo
+          - redo
+        formats:
+          - bold
+          - italic
+          - underline
+          - strikethrough
+          - code
+          - subscript
+          - superscript
+          - forecolor
+          - backcolor
+          - fontname
+          - fontsize
+        fonts:
+          - "Playfair Display"
+          - "Amharic Font"  # add any Google Font you want
+          - "Roboto"
+          - "Dancing Script"
+          - "Great Vibes"

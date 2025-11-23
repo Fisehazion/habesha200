@@ -2,40 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Sveltia CMS</title>
+  <title>Habesha200 Admin</title>
   <link rel="icon" href="data:,">
-</head>
-<body>
   <script type="module">
-    // Use jsDelivr with version to avoid 404 + CORS
-    import SveltiaCMS from 'https://cdn.jsdelivr.net/npm/sveltia-cms@0.4.0/dist/sveltia-cms.min.js';
+    import SveltiaCMS from 'https://cdn.jsdelivr.net/npm/sveltia-cms@latest/dist/sveltia-cms.js';
 
     SveltiaCMS({
-      backend: {
-        name: 'github',
-        repo: 'Fisehazion/habesha200',
-        branch: 'main',
-        token: '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' // replace this
+      i18n: { defaultLocale: 'en', locales: ['en'] },
+      site_url: 'https://behabeshawikana.netlify.app/', // CHANGE TO YOUR REAL URL
+      media: {
+        folder: '/images/uploads',
+        public_folder: '/images/uploads',
+        external: { library: [] }
       },
-      media_folder: 'images/uploads',
-      public_folder: '/images/uploads',
-      collections: [
-        {
-          name: 'blog',
-          label: 'Blog Posts',
-          folder: 'content/blog',
-          create: true,
-          slug: '{{year}}-{{month}}-{{day}}-{{slug}}',
-          fields: [
-            { label: 'Title', name: 'title', widget: 'string' },
-            { label: 'Date', name: 'date', widget: 'datetime' },
-            { label: 'Excerpt', name: 'excerpt', widget: 'text' },
-            { label: 'Body', name: 'body', widget: 'markdown' },
-            { label: 'YouTube Link', name: 'video_link', widget: 'string', required: false }
-          ]
-        }
-      ]
+      backend: {
+        name: 'git-gateway',
+        branch: 'main'
+      },
+      local_backend: {
+        url: 'http://localhost:8787/api/v1'
+      }
     });
   </script>
-</body>
+</head>
+<body></body>
 </html>

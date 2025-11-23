@@ -1,6 +1,10 @@
 [build]
   publish = "."
-  command = "echo 'Build complete'"
+  command = "echo 'No build required'"
+
+# Enable Netlify Identity + Git Gateway
+[build.environment]
+  NODE_VERSION = "18"
 
 [[redirects]]
   from = "/admin"
@@ -11,3 +15,9 @@
   from = "/admin/*"
   to = "/static/admin/:splat"
   status = 200
+
+# Required for Git Gateway
+[[headers]]
+  for = "/.netlify/git-gateway/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
