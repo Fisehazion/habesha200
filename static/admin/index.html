@@ -1,23 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>CMS</title>
+  <title>Behabeshawikana CMS</title>
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-
-<script type="module">
-  import SveltiaCMS from 'https://cdn.jsdelivr.net/npm/sveltia-cms@0.4.0/dist/sveltia-cms.js/+esm';
-  import { load } from 'https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.mjs';
-
-  fetch('/admin/config.yml')
-    .then(r => r.text())
-    .then(text => SveltiaCMS({ config: load(text) }))
-    .catch(() => {
-      document.body.innerHTML = '<h1 style="color:red;text-align:center;margin-top:100px">config.yml not found – check path</h1>';
+  <div id="app" style="padding: 20px; text-align: center; color: #666;">
+    Loading CMS... (If blank, check console for errors)
+  </div>
+  <script type="module">
+    import SveltiaCMS from 'https://cdn.jsdelivr.net/npm/sveltia-cms@0.4.0/dist/sveltia-cms.js/+esm';
+    
+    // Inline config (no fetch needed – fixes yml 404)
+    const config = {
+      backend: { name: 'git-gateway', branch: 'main' },
+      media_folder: '/images/uploads',
+      public_folder: '/images/uploads',
+      collections: [{
+        name: 'blog',
+        label: 'Blog Posts',
+        folder: 'content/blog',
+        create: true,
+        slug: '{{year}}-{{month}}-{{day}}-{{slug}}',
+        fields: [
+          { label: 'Title', name: 'title', widget: 'string' },
+          { label: 'Date', name: 'date', widget: 'datetime' },
+          { label: 'Excerpt', name: 'excerpt', widget: 'text' },
+          { label: 'Featured Image', name: 'image', widget: 'image' },
+          { label: 'YouTube ID', name: 'youtube', widget: 'string' },
+          { label: 'Body', name: 'body', widget: 'markdown' }
+        ]
+      }]
+    };
+    
+    // Start CMS
+    SveltiaCMS({ config });
+    
+    // Identity login on load
+    netlifyIdentity.on('init', user => {
+      if (!user) netlifyIdentity.open();
     });
-</script>
-
+    netlifyIdentity.init();
+  </script>
 </body>
 </html>
