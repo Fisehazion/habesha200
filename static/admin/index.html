@@ -2,35 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Habesha200 Admin</title>
-  <link rel="icon" href="data:,">
-  <script type="module">
-    // Fixed: Use stable version 0.4.0 (no 404)
-    import SveltiaCMS from 'https://cdn.jsdelivr.net/npm/sveltia-cms@0.4.0/dist/sveltia-cms.js';
-
-    // Load config.yml from same folder
-    fetch('/static/admin/config.yml')
-      .then(res => res.text())
-      .then(configText => {
-        const config = YAML.parse(configText); // Built-in YAML parser
-
-        SveltiaCMS({
-          ...config, // Merge with fetched config
-          i18n: { defaultLocale: 'en', locales: ['en'] },
-          site_url: 'https://behabeshawikana.netlify.app',
-          media: {
-            folder: '/images/uploads',
-            public_folder: '/images/uploads'
-          },
-          backend: {
-            name: 'git-gateway',
-            branch: 'main'
-          }
-        });
-      })
-      .catch(err => console.error('Config load failed:', err));
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script> <!-- YAML parser -->
+  <title>Behabeshawikana CMS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Netlify Identity (needed for login) -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
-<body></body>
+<body>
+
+<!-- Sveltia CMS – stable version that never 404s -->
+<script type="module">
+  import SveltiaCMS from 'https://cdn.jsdelivr.net/npm/sveltia-cms@0.4.0/dist/sveltia-cms.js';
+  import yaml from 'https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js';
+
+  // Load your config
+  fetch('/admin/config.yml')
+    .then(r => r.text())
+    .then(text => {
+      const config = yaml.load(text);
+      // Start Sveltia CMS
+      SveltiaCMS({ config });
+    })
+    .catch(err => {
+      document.body.innerHTML = `<h1 style="color:red; text-align:center; margin-top:100px;">
+        Error loading config.yml<br><br>${err}</h1>`;
+    });
+</script>
+
+</body>
 </html>
