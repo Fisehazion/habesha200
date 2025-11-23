@@ -3,41 +3,39 @@
 <head>
   <meta charset="utf-8">
   <title>Behabeshawikana CMS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-  <div id="app" style="padding: 20px; text-align: center; color: #666;">
-    Loading CMS... (If blank, check console for errors)
-  </div>
-  <script type="module">
-    import SveltiaCMS from 'https://cdn.jsdelivr.net/npm/sveltia-cms@0.4.0/dist/sveltia-cms.js/+esm';
-    
-    // Inline config (no fetch needed – fixes yml 404)
-    const config = {
-      backend: { name: 'git-gateway', branch: 'main' },
-      media_folder: '/images/uploads',
-      public_folder: '/images/uploads',
-      collections: [{
-        name: 'blog',
-        label: 'Blog Posts',
-        folder: 'content/blog',
-        create: true,
-        slug: '{{year}}-{{month}}-{{day}}-{{slug}}',
-        fields: [
-          { label: 'Title', name: 'title', widget: 'string' },
-          { label: 'Date', name: 'date', widget: 'datetime' },
-          { label: 'Excerpt', name: 'excerpt', widget: 'text' },
-          { label: 'Featured Image', name: 'image', widget: 'image' },
-          { label: 'YouTube ID', name: 'youtube', widget: 'string' },
-          { label: 'Body', name: 'body', widget: 'markdown' }
-        ]
-      }]
-    };
-    
-    // Start CMS
-    SveltiaCMS({ config });
-    
-    // Identity login on load
+  <div id="app" style="padding:20px;text-align:center;color:#666;">Loading CMS Dashboard...</div>
+  <script src="https://unpkg.com/decap-cms@^2.0.0/dist/decap-cms.js"></script>
+  <script>
+    CMS.init({
+      config: {
+        backend: {
+          name: 'git-gateway',
+          branch: 'main'
+        },
+        media_folder: '/images/uploads',
+        public_folder: '/images/uploads',
+        collections: [{
+          name: 'blog',
+          label: 'Blog Posts',
+          folder: 'content/blog',
+          create: true,
+          slug: '{{year}}-{{month}}-{{day}}-{{slug}}',
+          extension: 'md',
+          fields: [
+            { label: 'Title', name: 'title', widget: 'string' },
+            { label: 'Date', name: 'date', widget: 'datetime' },
+            { label: 'Excerpt', name: 'excerpt', widget: 'text' },
+            { label: 'Featured Image', name: 'image', widget: 'image' },
+            { label: 'YouTube ID', name: 'youtube', widget: 'string', hint: 'e.g. dQw4w9WgXcQ' },
+            { label: 'Body', name: 'body', widget: 'markdown', options: { brecht: { preview: false } } }
+          ]
+        }]
+      }
+    });
     netlifyIdentity.on('init', user => {
       if (!user) netlifyIdentity.open();
     });
