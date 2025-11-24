@@ -4,29 +4,33 @@
   <meta charset="utf-8">
   <title>Behabeshawikana CMS</title>
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <!-- Load Decap CMS first so CMS exists -->
-  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 </head>
-<body style="margin:40px;font-family:system-ui;background:#f8f9fa;">
-  <h2>Behabeshawikana CMS</h2>
-  <button id="loginBtn" style="padding:12px 30px;font-size:16px;background:#00a99d;color:white;border:none;border-radius:8px;cursor:pointer;">
-    Login with Netlify Identity
-  </button>
-  <p id="status" style="margin-top:20px;color:#333;">Status: Ready</p>
+<body>
+  <div id="login">
+    <h2>Behabeshawikana CMS</h2>
+    <button id="loginBtn" style="padding:15px 30px;font-size:18px;background:#00a99d;color:white;border:none;border-radius:8px;cursor:pointer;">
+      Login with Netlify Identity
+    </button>
+  </div>
+
+  <!-- Decap CMS (latest stable) -->
+  <script src="https://unpkg.com/decap-cms@3.3.2/dist/decap-cms.js"></script>
 
   <script>
-    document.getElementById('loginBtn').onclick = () => netlifyIdentity.open('login');
+    document.getElementById('loginBtn').onclick = () => netlifyIdentity.open();
 
-    netlifyIdentity.on('login', user => {
-      document.getElementById('status').innerHTML = `Logged in as <strong>${user.email}</strong> – Dashboard loading...`;
-      // CMS is now defined because script loaded first
-      setTimeout(() => {
-        window.CMS.init({
-          config: {
-            backend: { name: 'git-gateway', branch: 'main' },
-            media_folder: '/images/uploads',
-            public_folder: '/images/uploads',
-            collections: [{
+    netlifyIdentity.on('login', () => {
+      document.getElementById('login').style.display = 'none';
+
+      window.CMS_MANUAL_INIT = true;
+
+      window.CMS.init({
+        config: {
+          backend: { name: 'git-gateway', branch: 'main' },
+          media_folder: '/images/uploads',
+          public_folder: '/images/uploads',
+          collections: [
+            {
               name: 'blog',
               label: 'Blog Posts',
               folder: 'content/blog',
@@ -37,13 +41,13 @@
                 { label: 'Date', name: 'date', widget: 'datetime' },
                 { label: 'Excerpt', name: 'excerpt', widget: 'text' },
                 { label: 'Image', name: 'image', widget: 'image' },
-                { label: 'YouTube ID', name: 'youtube', widget: 'string' },
+                { label: 'YouTube ID', name: 'youtube', widget: 'string', required: false },
                 { label: 'Body', name: 'body', widget: 'markdown' }
               ]
-            }]
-          }
-        });
-      }, 800);
+            }
+          ]
+        }
+      });
     });
 
     netlifyIdentity.init();
