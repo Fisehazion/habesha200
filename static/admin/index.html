@@ -5,58 +5,48 @@
   <title>Behabeshawikana CMS</title>
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
-<body style="margin:0;padding:20px;font-family:sans-serif;background:#f9f9f9;">
+<body style="margin:40px;font-family:system-ui;background:#f4f4f4;">
   <h2>Behabeshawikana CMS</h2>
-  <p>Click below to login:</p>
-  <button id="loginBtn" style="padding:12px 24px;background:#00b3a6;color:white;border:none;border-radius:6px;font-size:16px;cursor:pointer;">Login with Netlify Identity</button>
-  <p id="status" style="margin-top:20px;color:#555;">Status: Loading...</p>
+  <button id="loginBtn" style="padding:12px 28px;font-size:16px;background:#00ad9f;color:white;border:none;border-radius:8px;cursor:pointer;">
+    Login with Netlify Identity
+  </button>
+  <p id="status" style="margin-top:20px;color:#333;">Status: Loading CMS...</p>
+
+  <!-- Decap CMS first (so CMS exists) -->
+  <script src="https://unpkg.com/decap-cms@^2.0.0/dist/decap-cms.js"></script>
 
   <script>
-    // Safe login function
-    function openLogin() {
-      if (window.netlifyIdentity) {
-        netlifyIdentity.open('login');
-      } else {
-        setTimeout(openLogin, 300);
-      }
-    }
+    document.getElementById('loginBtn').onclick = () => netlifyIdentity.open('login');
 
-    // Button click
-    document.getElementById('loginBtn').onclick = openLogin;
-
-    // When user logs in → start CMS
-    netlifyIdentity.on('init', user => {
-      if (user) {
-        document.getElementById('status').innerHTML = 'Logged in as <strong>' + user.email + '</strong> – Starting CMS...';
-        setTimeout(() => {
-          CMS.init({
-            config: {
-              backend: { name: 'git-gateway', branch: 'main' },
-              media_folder: '/images/uploads',
-              public_folder: '/images/uploads',
-              collections: [{
-                name: 'blog',
-                label: 'Blog Posts',
-                folder: 'content/blog',
-                create: true,
-                slug: '{{year}}-{{month}}-{{day}}-{{slug}}',
-                fields: [
-                  { label: 'Title', name: 'title', widget: 'string' },
-                  { label: 'Date', name: 'date', widget: 'datetime' },
-                  { label: 'Excerpt', name: 'excerpt', widget: 'text' },
-                  { label: 'Image', name: 'image', widget: 'image' },
-                  { label: 'YouTube ID', name: 'youtube', widget: 'string' },
-                  { label: 'Body', name: 'body', widget: 'markdown' }
-                ]
-              }]
-            }
-          });
-        }, 1000);
-      }
+    netlifyIdentity.on('login', user => {
+      document.getElementById('status').innerHTML = `Logged in as <strong>${user.email}</strong> – Starting dashboard...`;
+      setTimeout(() => {
+        CMS.init({
+          config: {
+            backend: { name: 'git-gateway', branch: 'main' },
+            media_folder: '/images/uploads',
+            public_folder: '/images/uploads',
+            collections: [{
+              name: 'blog',
+              label: 'Blog Posts',
+              folder: 'content/blog',
+              create: true,
+              slug: '{{year}}-{{month}}-{{day}}-{{slug}}',
+              fields: [
+                { label: 'Title', name: 'title', widget: 'string' },
+                { label: 'Date', name: 'date', widget: 'datetime' },
+                { label: 'Excerpt', name: 'excerpt', widget: 'text' },
+                { label: 'Image', name: 'image', widget: 'image' },
+                { label: 'YouTube ID', name: 'youtube', widget: 'string' },
+                { label: 'Body', name: 'body', widget: 'markdown' }
+              ]
+            }]
+          }
+        });
+      }, 800);
     });
 
     netlifyIdentity.init();
   </script>
-  <script src="https://unpkg.com/decap-cms@^2.0.0/dist/decap-cms.js" async></script>
 </body>
 </html>
