@@ -637,7 +637,7 @@ async function loadBlogPosts() {
           <button onclick="backToList()" class="mb-8 text-blue-600 font-bold text-lg hover:underline">&larr; Back to Blog</button>
           <article class="prose prose-lg max-w-none">
             ${frontmatter.title ? `<h1 class="text-4xl font-extrabold mb-6">${frontmatter.title}</h1>` : ''}
-            ${frontmatter.image ? `<img src="${frontmatter.image.startsWith('/') ? frontmatter.image : '/' + frontmatter.image}" alt="" class="w-full rounded-xl my-8">` : ''}
+           ${frontmatter.image ? `<img src="${frontmatter.image.startsWith('/') ? frontmatter.image : '/' + frontmatter.image}" alt="${frontmatter.title || ''}" class="w-full rounded-t-2xl object-contain bg-gray-50 border-b border-gray-200 cursor-pointer transition-transform hover:scale-[1.02]" loading="lazy" onclick="openLightbox('${frontmatter.image.startsWith('/') ? frontmatter.image : '/' + frontmatter.image}')">` : ''}
             ${frontmatter.youtube ? `<div class="my-12"><iframe class="w-full aspect-video rounded-xl" src="https://www.youtube.com/embed/${frontmatter.youtube}" frameborder="0" allowfullscreen></iframe></div>` : ''}
             ${html}
           </article>
