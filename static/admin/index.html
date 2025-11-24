@@ -13,36 +13,49 @@
     <p id="status" style="margin-top:20px;color:#666;">Status: Initializing...</p>
   </div>
   <script src="https://unpkg.com/decap-cms@^2.0.0/dist/decap-cms.js"></script>
-  <script>
-    netlifyIdentity.on('init', user => {
-      if (user) {
-        document.getElementById('status').innerHTML = 'Logged in as ' + user.email + '! Dashboard loading...';
-        CMS.init({
-          config: {
-            backend: { name: 'git-gateway', branch: 'main' },
-            media_folder: '/images/uploads',
-            public_folder: '/images/uploads',
-            collections: [{
-              name: 'blog',
-              label: 'Blog Posts',
-              folder: 'content/blog',
-              create: true,
-              slug: '{{year}}-{{month}}-{{day}}-{{slug}}',
-              extension: 'md',
-              fields: [
-                { label: 'Title', name: 'title', widget: 'string' },
-                { label: 'Date', name: 'date', widget: 'datetime' },
-                { label: 'Excerpt', name: 'excerpt', widget: 'text' },
-                { label: 'Featured Image', name: 'image', widget: 'image' },
-                { label: 'YouTube ID', name: 'youtube', widget: 'string', hint: 'e.g. dQw4w9WgXcQ' },
-                { label: 'Body', name: 'body', widget: 'markdown' }
-              ]
-            }]
-          }
-        });
-      }
+<script>
+  // Decap CMS CDN
+  const cmsScript = document.createElement('script');
+  cmsScript.src = 'https://unpkg.com/decap-cms@^2.0.0/dist/decap-cms.js';
+  cmsScript.onload = function() {
+    // Wait for DOM
+    document.addEventListener('DOMContentLoaded', function() {
+      netlifyIdentity.on('init', user => {
+        if (user) {
+          document.getElementById('status').innerHTML = 'Logged in as ' + user.email + '! Dashboard loading...';
+          // Force CMS init after login
+          setTimeout(() => {
+            CMS.init({
+              config: {
+                backend: { name: 'git-gateway', branch: 'main' },
+                media_folder: '/images/uploads',
+                public_folder: '/images/uploads',
+                collections: [{
+                  name: 'blog',
+                  label: 'Blog Posts',
+                  folder: 'content/blog',
+                  create: true,
+                  slug: '{{year}}-{{month}}-{{day}}-{{slug}}',
+                  extension: 'md',
+                  fields: [
+                    { label: 'Title', name: 'title', widget: 'string' },
+                    { label: 'Date', name: 'date', widget: 'datetime' },
+                    { label: 'Excerpt', name: 'excerpt', widget: 'text' },
+                    { label: 'Featured Image', name: 'image', widget: 'image' },
+                    { label: 'YouTube ID', name: 'youtube', widget: 'string', hint: 'e.g. dQw4w9WgXcQ' },
+                    { label: 'Body', name: 'body', widget: 'markdown' }
+                  ]
+                }]
+              }
+            });
+            document.getElementById('app').innerHTML = '<div id="cms-root"></div>'; // Mount point
+          }, 1000);
+        }
+      });
+      netlifyIdentity.init();
     });
-    netlifyIdentity.init();
-  </script>
+  };
+  document.head.appendChild(cmsScript);
+</script>
 </body>
 </html>
