@@ -4,24 +4,24 @@
   <meta charset="utf-8">
   <title>Behabeshawikana CMS</title>
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <!-- Load Decap CMS first so CMS exists -->
+  <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 </head>
-<body style="margin:40px;font-family:system-ui;background:#f4f4f4;">
+<body style="margin:40px;font-family:system-ui;background:#f8f9fa;">
   <h2>Behabeshawikana CMS</h2>
-  <button id="loginBtn" style="padding:12px 28px;font-size:16px;background:#00ad9f;color:white;border:none;border-radius:8px;cursor:pointer;">
+  <button id="loginBtn" style="padding:12px 30px;font-size:16px;background:#00a99d;color:white;border:none;border-radius:8px;cursor:pointer;">
     Login with Netlify Identity
   </button>
-  <p id="status" style="margin-top:20px;color:#333;">Status: Loading CMS...</p>
-
-  <!-- Decap CMS first (so CMS exists) -->
-  <script src="https://unpkg.com/decap-cms@^2.0.0/dist/decap-cms.js"></script>
+  <p id="status" style="margin-top:20px;color:#333;">Status: Ready</p>
 
   <script>
     document.getElementById('loginBtn').onclick = () => netlifyIdentity.open('login');
 
     netlifyIdentity.on('login', user => {
-      document.getElementById('status').innerHTML = `Logged in as <strong>${user.email}</strong> – Starting dashboard...`;
+      document.getElementById('status').innerHTML = `Logged in as <strong>${user.email}</strong> – Dashboard loading...`;
+      // CMS is now defined because script loaded first
       setTimeout(() => {
-        CMS.init({
+        window.CMS.init({
           config: {
             backend: { name: 'git-gateway', branch: 'main' },
             media_folder: '/images/uploads',
