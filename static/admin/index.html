@@ -4,6 +4,20 @@
   <meta charset="utf-8">
   <title>Behabeshawikana CMS</title>
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+  <style>
+    /* NEW: Make images in CMS show full height – no cropping */
+    .image-widget-control img {
+      object-fit: contain !important;
+      max-height: 600px !important;
+      background: #f9fafb !important;
+      padding: 8px !important;
+      border-radius: 12px !important;
+    }
+    .image-widget-control .image-widget-preview {
+      height: auto !important;
+      min-height: 300px !important;
+    }
+  </style>
 </head>
 <body>
   <div id="login">
@@ -40,7 +54,18 @@
                 { label: 'Title', name: 'title', widget: 'string' },
                 { label: 'Date', name: 'date', widget: 'datetime' },
                 { label: 'Excerpt', name: 'excerpt', widget: 'text' },
-                { label: 'Image', name: 'image', widget: 'image' },
+                { 
+                  label: 'Image', 
+                  name: 'image', 
+                  widget: 'image',
+                  /* NEW: Force full preview in CMS */
+                  allow_multiple: false,
+                  media_library: {
+                    config: {
+                      max_file_size: 5242880, // 5MB
+                    }
+                  }
+                },
                 { label: 'YouTube ID', name: 'youtube', widget: 'string', required: false },
                 { label: 'Body', name: 'body', widget: 'markdown' }
               ]
