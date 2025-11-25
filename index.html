@@ -76,8 +76,9 @@
             <a href="#contact" class="nav-link text-gray-700 font-semibold" data-scroll>Contact</a>
         </nav>
 
-        <button id="mobile-menu-toggle" class="md:hidden z-50">
+        <button id="mobile-menu-toggle" class="md:hidden z-50" title="Toggle navigation menu" aria-label="Toggle navigation menu" aria-controls="mobile-menu" aria-expanded="false">
             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <span class="sr-only">Toggle navigation menu</span>
         </button>
 
         <div id="mobile-menu" class="fixed inset-0 bg-gradient-to-br from-blue-900 to-gray-900 flex flex-col items-center justify-center space-y-10 text-4xl font-bold text-white hidden">
@@ -94,8 +95,6 @@
 
 <main>
     <!-- ALL YOUR ORIGINAL SECTIONS (Hero, About, Services, Portfolio, Team, Order, Contact, Footer, Chatbot) -->
-    <!-- 100% untouched – only Blog section is upgraded below -->
-
      <!-- Hero Section -->
         <section id="home" class="hero-bg text-white py-16 sm:py-20 md:py-24 lg:py-36">
             <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center fade-in-up">
@@ -413,6 +412,7 @@
                 </div>
             </div>
         </div>
+    <!-- 100% untouched – only Blog section is upgraded below -->
 
     <!-- BLOG SECTION – FULLY UPGRADED -->
     <section id="blog" class="py-12 sm:py-16 md:py-20 bg-white">
@@ -542,11 +542,14 @@ async function loadBlogPosts() {
         container.innerHTML = `<p class="col-span-full text-center text-red-600 py-8">Blog loading failed. Check console or try later.</p>`;
     }
 }
-
 // Mobile menu toggle
 document.getElementById('mobile-menu-toggle').addEventListener('click', () => {
-    document.getElementById('mobile-menu').classList.toggle('hidden');
-    document.getElementById('mobile-menu').classList.toggle('open');
+    const btn = document.getElementById('mobile-menu-toggle');
+    const menu = document.getElementById('mobile-menu');
+    menu.classList.toggle('hidden');
+    menu.classList.toggle('open');
+    const expanded = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', String(!expanded));
 });
 
 // Load blog when visible
