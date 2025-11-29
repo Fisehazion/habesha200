@@ -16,6 +16,7 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/typography@0.5.10/src/index.min.js"></script>
     
     <!-- Import Map for Gemini SDK and Marked -->
     <script type="importmap">
@@ -553,16 +554,36 @@
                 const html = marked.parse(body);
 
                 const card = document.createElement('div');
-                card.className = "bg-white border border-gray-200 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition transform hover:scale-105 cursor-pointer flex flex-col h-full";
+                // Updated Card Styling for better visuals
+                card.className = "group bg-white rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-300 border border-gray-100 overflow-hidden flex flex-col h-full transform hover:-translate-y-1 cursor-pointer";
                 
+                // Image handling: object-contain to show full image without crop, centered in a gray box
+                const imageSection = frontmatter.image 
+                    ? `<div class="h-64 bg-gray-50 flex items-center justify-center overflow-hidden relative border-b border-gray-100">
+                         <img src="${frontmatter.image.startsWith('/') ? frontmatter.image : '/' + frontmatter.image}" 
+                              alt="${frontmatter.title || ''}" 
+                              class="w-full h-full object-contain p-2 transition-transform duration-700 group-hover:scale-110" loading="lazy">
+                       </div>` 
+                    : `<div class="h-64 bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
+                         <span class="text-4xl">📝</span>
+                       </div>`;
+
                 card.innerHTML = `
-                    ${frontmatter.image ? `<img src="${frontmatter.image.startsWith('/') ? frontmatter.image : '/' + frontmatter.image}" alt="${frontmatter.title || ''}" class="w-full h-48 object-cover">` : ''}
-                    <div class="p-6 flex-grow flex flex-col">
-                        <h3 class="text-2xl font-bold text-gray-900 mb-2 line-clamp-2">${frontmatter.title || file.name.replace('.md', '').replace(/-/g, ' ')}</h3>
-                        ${frontmatter.excerpt ? `<p class="text-gray-600 mb-4 line-clamp-3">${frontmatter.excerpt}</p>` : ''}
-                        <div class="mt-auto">
-                             <p class="text-sm text-gray-500 mb-3">${frontmatter.date ? new Date(frontmatter.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'No date'}</p>
-                             <span class="text-blue-600 font-bold hover:underline">Read More →</span>
+                    ${imageSection}
+                    <div class="p-6 flex flex-col flex-grow relative">
+                        <div class="mb-4">
+                             <p class="text-xs font-semibold tracking-wider text-blue-600 uppercase mb-2">
+                                ${frontmatter.date ? new Date(frontmatter.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Blog Post'}
+                             </p>
+                            <h3 class="text-xl font-bold text-gray-900 group-hover:text-blue-700 transition-colors line-clamp-2 leading-tight">
+                                ${frontmatter.title || file.name.replace('.md', '').replace(/-/g, ' ')}
+                            </h3>
+                        </div>
+                        ${frontmatter.excerpt ? `<p class="text-gray-600 text-sm mb-6 line-clamp-3 leading-relaxed flex-grow">${frontmatter.excerpt}</p>` : ''}
+                        
+                        <div class="mt-auto flex items-center text-blue-600 font-bold group/btn">
+                            <span class="mr-2 group-hover/btn:underline">Read Article</span>
+                            <svg class="w-4 h-4 transform transition-transform group-hover/btn:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m-4-4h8"></path></svg>
                         </div>
                     </div>
                 `;
@@ -570,12 +591,33 @@
                 card.onclick = () => {
                     // Render Detail View
                     detail.innerHTML = `
-                        <button id="back-to-blog" class="mb-8 text-blue-600 font-bold text-lg hover:underline">&larr; Back to Blog</button>
-                        <article class="prose prose-lg max-w-none">
-                            ${frontmatter.title ? `<h1 class="text-4xl font-extrabold mb-6">${frontmatter.title}</h1>` : ''}
-                            ${frontmatter.image ? `<img src="${frontmatter.image.startsWith('/') ? frontmatter.image : '/' + frontmatter.image}" class="w-full rounded-xl object-contain mb-8 shadow-md">` : ''}
-                            ${frontmatter.youtube ? `<div class="my-12"><iframe class="w-full aspect-video rounded-xl shadow-lg" src="https://www.youtube.com/embed/${frontmatter.youtube}" frameborder="0" allowfullscreen></iframe></div>` : ''}
-                            ${html}
+                        <button id="back-to-blog" class="mb-8 inline-flex items-center text-gray-600 hover:text-blue-600 font-semibold transition-colors group">
+                            <span class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-2 group-hover:bg-blue-100 transition-colors">
+                                <svg class="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                            </span>
+                            Back to Blog
+                        </button>
+                        
+                        <article class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+                            ${frontmatter.image ? `
+                            <div class="w-full bg-gray-50 border-b border-gray-100 p-4">
+                                <img src="${frontmatter.image.startsWith('/') ? frontmatter.image : '/' + frontmatter.image}" 
+                                     class="w-full max-h-[600px] object-contain mx-auto rounded-lg shadow-sm" 
+                                     alt="${frontmatter.title || ''}">
+                            </div>` : ''}
+                            
+                            <div class="p-8 md:p-12 lg:p-16">
+                                <header class="mb-10 text-center max-w-3xl mx-auto border-b border-gray-100 pb-10">
+                                    ${frontmatter.date ? `<time class="text-sm font-bold text-blue-600 uppercase tracking-widest mb-3 block">${new Date(frontmatter.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</time>` : ''}
+                                    ${frontmatter.title ? `<h1 class="text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 leading-tight mb-6">${frontmatter.title}</h1>` : ''}
+                                </header>
+                                
+                                ${frontmatter.youtube ? `<div class="my-12 max-w-4xl mx-auto"><div class="aspect-w-16 aspect-h-9 rounded-2xl overflow-hidden shadow-2xl"><iframe class="w-full h-full" src="https://www.youtube.com/embed/${frontmatter.youtube}" frameborder="0" allowfullscreen></iframe></div></div>` : ''}
+                                
+                                <div class="prose prose-lg prose-blue max-w-3xl mx-auto text-gray-700 leading-loose">
+                                    ${html}
+                                </div>
+                            </div>
                         </article>
                     `;
                     
@@ -584,7 +626,7 @@
                         container.classList.remove('hidden');
                         // Scroll back to blog section top
                         const blogSection = document.getElementById('blog');
-                        const headerOffset = 80;
+                        const headerOffset = 100;
                         const elementPosition = blogSection.getBoundingClientRect().top;
                         const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
                         window.scrollTo({ top: offsetPosition, behavior: "smooth" });
@@ -594,7 +636,7 @@
                     detail.classList.remove('hidden');
                     // Scroll to top of blog section
                     const blogSection = document.getElementById('blog');
-                    const headerOffset = 80;
+                    const headerOffset = 100;
                     const elementPosition = blogSection.getBoundingClientRect().top;
                     const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
                     window.scrollTo({ top: offsetPosition, behavior: "smooth" });
@@ -604,7 +646,7 @@
             }
         } catch (err) {
             console.error("Blog error:", err);
-            container.innerHTML = `<p class="col-span-full text-center text-red-600 py-8">Blog loading failed. Please try again later.</p>`;
+            container.innerHTML = `<div class="col-span-full text-center py-12"><p class="text-red-500 bg-red-50 inline-block px-4 py-2 rounded-lg">Failed to load blog posts. Please try again later.</p></div>`;
         }
     }
 
@@ -663,7 +705,6 @@ Portfolio: Sample scripts available for EOTC spiritual content, tech content, an
     `;
 
     // API Setup
-    // Note: In a real production app, never expose your API key in client-side code.
     const apiKey = 'AIzaSyB0wES8Ue1guwXa9lkzNSxdRDtVEY2e-RI'; 
     const ai = new GoogleGenAI({ apiKey: apiKey });
 
