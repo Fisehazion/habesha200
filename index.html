@@ -16,7 +16,19 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Import Map for Gemini SDK and Marked -->
+    <script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.run/@google/genai",
+    "marked": "https://esm.run/marked",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/"
+  }
+}
+</script>
 
     <style>
         body{font-family:'Inter',sans-serif;background:linear-gradient(-45deg,#f7fafc,#e0e7ff,#d1fae5,#fef3c7);background-size:400% 400%;animation:gradientShift 15s ease infinite;overflow-x:hidden;scroll-behavior:smooth;}
@@ -34,177 +46,211 @@
         .team-member,.portfolio-card{transition:transform .3s,box-shadow .3s}
         .team-member:hover,.portfolio-card:hover{transform:translateY(-5px);box-shadow:0 8px 24px rgba(0,0,0,.2)}
         .prose img{max-width:100%;height:auto;border-radius:12px;margin:1.5rem 0}
+        
+        /* Chatbot Styles */
+        .chat-window {
+            position: fixed; bottom: 80px; right: 20px; width: 350px; height: 500px;
+            background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: flex; flex-direction: column; overflow: hidden; z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .chat-header { padding: 16px; display: flex; justify-content: space-between; align-items: center; }
+        .chat-body { flex-grow: 1; padding: 16px; overflow-y: auto; background-color: #f9fafb; display: flex; flex-direction: column; gap: 12px; }
+        .chat-input { padding: 16px; border-top: 1px solid #e5e7eb; display: flex; gap: 8px; background: white; }
+        .message { padding: 10px 14px; border-radius: 12px; max-width: 80%; font-size: 0.95rem; line-height: 1.4; }
+        .bot-message { background-color: white; border: 1px solid #e5e7eb; color: #1f2937; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .user-message { background-color: #2563eb; color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
     </style>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-MHJ63C4XVD"></script>
     <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-MHJ63C4XVD');</script>
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
-<body>
+<body class="antialiased">
 
-
-<header class="bg-white shadow-lg sticky top-0 z-40">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-3 flex items-center relative">
-        <div class="logo-container flex items-center mr-4">
-            <img src="images/ChatGPT Image Aug 28, 2025, 11_33_43 PM.png" alt="Logo" class="h-6 sm:h-8 md:h-10 w-12 sm:w-16 md:w-20 object-contain" loading="lazy">
-        </div>
-        <div class="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900">Behabeshawikana</div>
-        <div class="flex items-center ml-auto">
-            <nav class="space-x-4 sm:space-x-6 md:space-x-8 hidden md:flex" id="nav-menu">
-                <a href="#home" class="text-gray-600 hover:text-gray-900 font-semibold transition duration-300" data-scroll>Home</a>
-                <a href="#about" class="text-gray-600 hover:text-gray-900 font-semibold transition duration-300" data-scroll>About</a>
-                <a href="#services" class="text-gray-600 hover:text-gray-900 font-semibold transition duration-300" data-scroll>Services</a>
-                <a href="#portfolio" class="text-gray-600 hover:text-gray-900 font-semibold transition duration-300" data-scroll>Portfolio</a>
-                <a href="#blog" class="text-gray-600 hover:text-gray-900 font-semibold transition duration-300" data-scroll>Blog</a>
-                <a href="#order" class="text-gray-600 hover:text-gray-900 font-semibold transition duration-300" data-scroll>Order</a>
-                <a href="#contact" class="text-gray-600 hover:text-gray-900 font-semibold transition duration-300" data-scroll>Contact</a>
-            </nav>
-            <button id="mobile-menu-toggle" class="md:hidden text-gray-600 hover:text-gray-900 ml-4" aria-label="Toggle mobile menu" title="Toggle mobile menu">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-            </button>
-            <div id="mobile-menu" class="mobile-menu hidden">
-                <a href="#home" data-scroll>Home</a><a href="#about" data-scroll>About</a><a href="#services" data-scroll>Services</a>
-                <a href="#portfolio" data-scroll>Portfolio</a><a href="#blog" data-scroll>Blog</a><a href="#order" data-scroll>Order</a><a href="#contact" data-scroll>Contact</a>
+<!-- NAVIGATION BAR -->
+<header id="main-header" class="fixed w-full top-0 z-50 transition-all duration-300 bg-white/90 backdrop-blur-md shadow-md">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16 sm:h-20">
+            <!-- Logo -->
+            <div class="flex-shrink-0 flex items-center cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                <img src="images/ChatGPT Image Aug 28, 2025, 11_33_43 PM.png" alt="Logo" class="h-8 sm:h-10 w-auto mr-3">
+                <span class="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight">Behabeshawikana</span>
             </div>
+            
+            <!-- Desktop Menu -->
+            <nav class="hidden md:flex space-x-8">
+                <a href="#home" class="text-gray-600 hover:text-blue-600 font-medium transition duration-200">Home</a>
+                <a href="#about" class="text-gray-600 hover:text-blue-600 font-medium transition duration-200">About</a>
+                <a href="#services" class="text-gray-600 hover:text-blue-600 font-medium transition duration-200">Services</a>
+                <a href="#portfolio" class="text-gray-600 hover:text-blue-600 font-medium transition duration-200">Portfolio</a>
+                <a href="#blog" class="text-gray-600 hover:text-blue-600 font-medium transition duration-200">Blog</a>
+                <a href="#order" class="text-gray-600 hover:text-blue-600 font-medium transition duration-200">Order</a>
+                <a href="#contact" class="text-gray-600 hover:text-blue-600 font-medium transition duration-200">Contact</a>
+            </nav>
+
+            <!-- Mobile Menu Button -->
+            <div class="md:hidden">
+                <button id="mobile-menu-btn" class="text-gray-600 hover:text-gray-900 focus:outline-none p-2" aria-label="Toggle menu">
+                    <svg id="menu-icon" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                    <svg id="close-icon" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Menu Dropdown -->
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 shadow-lg absolute w-full left-0 top-full">
+        <div class="px-4 pt-2 pb-6 space-y-1">
+            <a href="#home" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50">Home</a>
+            <a href="#about" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50">About</a>
+            <a href="#services" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50">Services</a>
+            <a href="#portfolio" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50">Portfolio</a>
+            <a href="#blog" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50">Blog</a>
+            <a href="#order" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50">Order</a>
+            <a href="#contact" class="block px-3 py-3 rounded-md text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50">Contact</a>
         </div>
     </div>
 </header>
 
-<main>
-    <!-- YOUR FULL HERO, ABOUT, SERVICES, PORTFOLIO, TEAM, ORDER, CONTACT SECTIONS (unchanged) -->
-    <!-- I kept everything 100% identical – only adding Blog section below -->
+<main class="pt-16"> <!-- Padding top to account for fixed header -->
 
     <!-- Hero Section -->
-        <section id="home" class="hero-bg text-white py-16 sm:py-20 md:py-24 lg:py-36">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center fade-in-up">
-                <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold mb-4 sm:mb-6 leading-tight">Crafting Stories That Inspire</h1>
-                <p class="text-lg sm:text-xl md:text-2xl lg:text-3xl mb-6 sm:mb-10 font-light max-w-xl sm:max-w-2xl md:max-w-3xl mx-auto">Behabeshawikana delivers compelling narratives for all media with expert writers and strategists.</p>
-                <a href="#services" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-3 sm:py-4 px-6 sm:px-10 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-base sm:text-lg" data-scroll>Discover Our Services Now</a>
-            </div>
-        </section>
+    <section id="home" class="hero-bg text-white py-16 sm:py-20 md:py-24 lg:py-36">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center fade-in-up">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold mb-4 sm:mb-6 leading-tight">Crafting Stories That Inspire</h1>
+            <p class="text-lg sm:text-xl md:text-2xl lg:text-3xl mb-6 sm:mb-10 font-light max-w-xl sm:max-w-2xl md:max-w-3xl mx-auto">Behabeshawikana delivers compelling narratives for all media with expert writers and strategists.</p>
+            <a href="#services" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-3 sm:py-4 px-6 sm:px-10 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-base sm:text-lg" data-scroll>Discover Our Services Now</a>
+        </div>
+    </section>
 
-        <!-- CTA Banner -->
-        <section class="py-8 sm:py-10 bg-gradient-to-r from-gray-800 to-gray-600 text-white text-center">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8 fade-in-up">
-                <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">Ready to Tell Your Story?</h2>
-                <p class="text-base sm:text-lg mb-4 sm:mb-6 max-w-md sm:max-w-xl mx-auto">Partner with us to create impactful content that resonates with your audience.</p>
-                <a href="#order" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 sm:py-3 px-6 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-base sm:text-lg" data-scroll>Start Your Project Today</a>
-            </div>
-        </section>
+    <!-- CTA Banner -->
+    <section class="py-8 sm:py-10 bg-gradient-to-r from-gray-800 to-gray-600 text-white text-center">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 fade-in-up">
+            <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 sm:mb-4">Ready to Tell Your Story?</h2>
+            <p class="text-base sm:text-lg mb-4 sm:mb-6 max-w-md sm:max-w-xl mx-auto">Partner with us to create impactful content that resonates with your audience.</p>
+            <a href="#order" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 sm:py-3 px-6 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-base sm:text-lg" data-scroll>Start Your Project Today</a>
+        </div>
+    </section>
 
-        <!-- About Section -->
-        <section id="about" class="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-gray-50 to-white">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="max-w-2xl sm:max-w-3xl md:max-w-4xl mx-auto text-center fade-in-up">
-                    <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 sm:mb-6 text-gray-900">About Behabeshawikana</h2>
-                    <p class="text-base sm:text-lg text-gray-700 leading-relaxed mb-3 sm:mb-4">Behabeshawikana transforms ideas into stories that captivate and inspire. Our diverse team creates authentic, high-quality content tailored to tech related, spiritual, and business needs.</p>
-                    <p class="text-base sm:text-lg text-gray-700 leading-relaxed">From research-driven tech content to meaningful EOTC spiritual works, we’re dedicated to delivering excellence.</p>
-                </div>
-                <div class="flex justify-center mt-6 sm:mt-8 md:mt-12 fade-in-up">
-                    <a href="#team" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-3 sm:py-4 px-8 sm:px-10 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-base sm:text-lg" data-scroll>Meet Our Team</a>
-                </div>
+    <!-- About Section -->
+    <section id="about" class="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-gray-50 to-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-2xl sm:max-w-3xl md:max-w-4xl mx-auto text-center fade-in-up">
+                <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 sm:mb-6 text-gray-900">About Behabeshawikana</h2>
+                <p class="text-base sm:text-lg text-gray-700 leading-relaxed mb-3 sm:mb-4">Behabeshawikana transforms ideas into stories that captivate and inspire. Our diverse team creates authentic, high-quality content tailored to tech related, spiritual, and business needs.</p>
+                <p class="text-base sm:text-lg text-gray-700 leading-relaxed">From research-driven tech content to meaningful EOTC spiritual works, we’re dedicated to delivering excellence.</p>
             </div>
-        </section>
+            <div class="flex justify-center mt-6 sm:mt-8 md:mt-12 fade-in-up">
+                <a href="#team" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-3 sm:py-4 px-8 sm:px-10 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-base sm:text-lg" data-scroll>Meet Our Team</a>
+            </div>
+        </div>
+    </section>
 
-        <!-- Services Section -->
-        <section id="services" class="py-12 sm:py-16 md:py-20 bg-white">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-6 sm:mb-8 md:mb-12 fade-in-up">Our Core Services</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                    <!-- Technical Content -->
-                    <div class="bg-gray-100 p-4 sm:p-6 rounded-2xl shadow-lg transition transform hover:scale-105 hover:shadow-2xl fade-in-up">
-                        <div class="flex items-center justify-center h-12 sm:h-16 w-12 sm:w-16 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-full mx-auto mb-3 sm:mb-6">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
-                        </div>
-                        <h3 class="text-lg sm:text-xl font-semibold text-center mb-2 sm:mb-4">Tech related script writing services</h3>
-                        <p class="text-gray-600 text-center text-sm sm:text-base">Clear, accurate, and engaging technical documentation, blogs, and articles for the tech industry.</p>
-                        <div class="mt-4 text-center">
-                            <a href="#order" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base" data-scroll>Order Tech Script Now</a>
-                        </div>
+    <!-- Services Section -->
+    <section id="services" class="py-12 sm:py-16 md:py-20 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-6 sm:mb-8 md:mb-12 fade-in-up">Our Core Services</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                <!-- Technical Content -->
+                <div class="bg-gray-100 p-4 sm:p-6 rounded-2xl shadow-lg transition transform hover:scale-105 hover:shadow-2xl fade-in-up">
+                    <div class="flex items-center justify-center h-12 sm:h-16 w-12 sm:w-16 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-full mx-auto mb-3 sm:mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
                     </div>
-                    <!-- Business Content -->
-                    <div class="bg-gray-100 p-4 sm:p-6 rounded-2xl shadow-lg transition transform hover:scale-105 hover:shadow-2xl fade-in-up">
-                        <div class="flex items-center justify-center h-12 sm:h-16 w-12 sm:w-16 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-full mx-auto mb-3 sm:mb-6">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-                        </div>
-                        <h3 class="text-lg sm:text-xl font-semibold text-center mb-2 sm:mb-4">Business Related Content script writing services</h3>
-                        <p class="text-gray-600 text-center text-sm sm:text-base">Promotional scripts and ad copy to effectively reach your audience.</p>
-                        <div class="mt-4 text-center">
-                            <a href="#order" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base" data-scroll>Order Business Script Now</a>
-                        </div>
-                    </div>
-                    <!-- EOTC Spiritual Content -->
-                    <div class="bg-gray-100 p-4 sm:p-6 rounded-2xl shadow-lg transition transform hover:scale-105 hover:shadow-2xl fade-in-up">
-                        <div class="flex items-center justify-center h-12 sm:h-16 w-12 sm:w-16 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-full mx-auto mb-3 sm:mb-6">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-                        </div>
-                        <h3 class="text-lg sm:text-xl font-semibold text-center mb-2 sm:mb-4">EOTC Spiritual Content script writing services</h3>
-                        <p class="text-gray-600 text-center text-sm sm:text-base">Uplifting content scripts based on Ethiopian Orthodox Tewahedo Church traditions.</p>
-                        <div class="mt-4 text-center">
-                            <a href="#order" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base" data-scroll>Order EOTC Script Now</a>
-                        </div>
+                    <h3 class="text-lg sm:text-xl font-semibold text-center mb-2 sm:mb-4">Tech related script writing services</h3>
+                    <p class="text-gray-600 text-center text-sm sm:text-base">Clear, accurate, and engaging technical documentation, blogs, and articles for the tech industry.</p>
+                    <div class="mt-4 text-center">
+                        <a href="#order" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base" data-scroll>Order Tech Script Now</a>
                     </div>
                 </div>
-            </div>
-        </section>
-
-         <!-- Portfolio Section -->
-<section id="portfolio" class="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-gray-50 to-white">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-6 sm:mb-8 md:mb-12 fade-in-up">Our Script Samples</h2>
-        <p class="text-base sm:text-lg text-gray-700 text-center max-w-xl sm:max-w-2xl md:max-w-3xl mx-auto mb-8 sm:mb-12 leading-relaxed">Explore our sample scripts to see the quality and creativity we bring to Tech, Business and EOTC content. Ready to start your project? Order now!</p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            
-            <!-- Tech Sample -->
-            <div class="portfolio-card fade-in-up">
-                <h3 class="text-lg sm:text-xl font-semibold text-center mb-2 sm:mb-4 text-gray-900">Tech Script</h3>
-                <p class="text-gray-600 text-sm sm:text-base mb-4">
-                    <span class="portfolio-highlight font-bold text-red-600">
-                        "... በዘመናዊው የቴክኖሎጂ ዓለም ውስጥ ያለ እርሱ ምንም ማድረግ የማንችለውን፣ ለሁሉም የኤሌክትሮኒክስ መሣሪያዎቻችን እንደ "የዲጂታል ዓለም ወርቅ" የሚያገለግለውን ሲሊከን (Silicon) ንጥረ ነገር አብረን እንቃኛለን። ሲሊከን እንዴት የዘመኑ ቴክኖሎጂ መሰረት ሊሆን ቻለ? ከየትስ ይገኛል?..."
-                    </span>
-                </p>
-                <div class="flex justify-center space-x-4">
-                    <a href="https://docs.google.com/document/d/1PupeMnXWwAtJplxK5ImQ3J9QEpVCgVvEEN6t97hcctU/edit?usp=drive_link" target="_blank" rel="noopener noreferrer" class="bg-gradient-to-r from-gray-900 to-gray-700 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base">View Full Sample</a>
-                    <a href="#order" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base" data-scroll>Order Tech Script</a>
+                <!-- Business Content -->
+                <div class="bg-gray-100 p-4 sm:p-6 rounded-2xl shadow-lg transition transform hover:scale-105 hover:shadow-2xl fade-in-up">
+                    <div class="flex items-center justify-center h-12 sm:h-16 w-12 sm:w-16 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-full mx-auto mb-3 sm:mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                    </div>
+                    <h3 class="text-lg sm:text-xl font-semibold text-center mb-2 sm:mb-4">Business Related Content script writing services</h3>
+                    <p class="text-gray-600 text-center text-sm sm:text-base">Promotional scripts and ad copy to effectively reach your audience.</p>
+                    <div class="mt-4 text-center">
+                        <a href="#order" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base" data-scroll>Order Business Script Now</a>
+                    </div>
                 </div>
-            </div>
-            
-            <!-- Business Sample -->
-            <div class="portfolio-card fade-in-up">
-                <h3 class="text-lg sm:text-xl font-semibold text-center mb-2 sm:mb-4 text-gray-900">Business Script</h3>
-                <p class="text-gray-600 text-sm sm:text-base mb-4">
-                    <span class="portfolio-highlight font-bold text-red-600">
-                        " በዚህ ነገሮች እንደ ዓይን ጥቅሻ በሚለዋወጡበት ዘመን ከዘመኑ ጋር መዘምን አማራጭ ሳይሆን የግድ ይሎታል! 
-                        ለመፍጠን ከፈለጉ ደግሞ ሁሉንም ነገር እርሶ መሥራት አይጠበቅቦትም! ..."
-                    </span>
-                </p>
-                <div class="flex justify-center space-x-4">
-                    <a href="https://docs.google.com/document/d/1ZYI5YqtiIIv9x0ySJoPumrf3XfQd9gFgDsl7q4R_fwA/edit?usp=drive_link" target="_blank" rel="noopener noreferrer" class="bg-gradient-to-r from-gray-900 to-gray-700 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base">View Full Sample</a>
-                    <a href="#order" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base" data-scroll>Order Business Script</a>
-                </div>
-            </div>
-            
-            <!-- EOTC Sample -->
-            <div class="portfolio-card fade-in-up">
-                <h3 class="text-lg sm:text-xl font-semibold text-center mb-2 sm:mb-4 text-gray-900">EOTC Spiritual Script</h3>
-                <p class="text-gray-600 text-sm sm:text-base mb-4">
-                    <span class="portfolio-highlight font-bold text-red-600">
-                        " ንብ እና አበባ እንዴት ተዛመዱ? ... እንግዲህ እነዚህ ማሰብ እና ማሰላሰል የማይችሉ እንዲሁም በወገን እንኳን የማይገናኙ እጽዋእት እና ነፍሳት ተግባብተው አንዱ አንዱ እያገለገሉ የሚኖሩ ከሆኑ እኛ አንድ ወገን የሆንን የሰው ልጆች አንዳችን አንዳችንን እያገለገልን በማገልገል ውስጥ ለራሳችን እየተገለገልን እንዳንኖር የከለከለን ምንድነው? ..."
-                    </span>
-                </p>
-                <div class="flex justify-center space-x-4">
-                    <a href="https://docs.google.com/document/d/1zcoh8HYsp2kpsQtujDmc_Dakk39mxdeZrJGn804rVos/edit?usp=sharing" target="_blank" rel="noopener noreferrer" class="bg-gradient-to-r from-gray-900 to-gray-700 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base">View Full Sample</a>
-                    <a href="#order" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base" data-scroll>Order EOTC Script</a>
+                <!-- EOTC Spiritual Content -->
+                <div class="bg-gray-100 p-4 sm:p-6 rounded-2xl shadow-lg transition transform hover:scale-105 hover:shadow-2xl fade-in-up">
+                    <div class="flex items-center justify-center h-12 sm:h-16 w-12 sm:w-16 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-full mx-auto mb-3 sm:mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+                    </div>
+                    <h3 class="text-lg sm:text-xl font-semibold text-center mb-2 sm:mb-4">EOTC Spiritual Content script writing services</h3>
+                    <p class="text-gray-600 text-center text-sm sm:text-base">Uplifting content scripts based on Ethiopian Orthodox Tewahedo Church traditions.</p>
+                    <div class="mt-4 text-center">
+                        <a href="#order" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base" data-scroll>Order EOTC Script Now</a>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="text-center mt-8 fade-in-up">
-            <a href="#order" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-3 sm:py-4 px-8 sm:px-10 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-base sm:text-lg" data-scroll>Get Your Custom Script Today</a>
-        </div>
-    </div>
-</section>
+    </section>
 
-         <!-- BLOG SECTION (NEW) -->
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-gray-50 to-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-6 sm:mb-8 md:mb-12 fade-in-up">Our Script Samples</h2>
+            <p class="text-base sm:text-lg text-gray-700 text-center max-w-xl sm:max-w-2xl md:max-w-3xl mx-auto mb-8 sm:mb-12 leading-relaxed">Explore our sample scripts to see the quality and creativity we bring to Tech, Business and EOTC content. Ready to start your project? Order now!</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                
+                <!-- Tech Sample -->
+                <div class="portfolio-card fade-in-up bg-white p-6 rounded-2xl shadow-md">
+                    <h3 class="text-lg sm:text-xl font-semibold text-center mb-2 sm:mb-4 text-gray-900">Tech Script</h3>
+                    <p class="text-gray-600 text-sm sm:text-base mb-4">
+                        <span class="portfolio-highlight font-bold text-red-600">
+                            "... በዘመናዊው የቴክኖሎጂ ዓለም ውስጥ ያለ እርሱ ምንም ማድረግ የማንችለውን፣ ለሁሉም የኤሌክትሮኒክስ መሣሪያዎቻችን እንደ "የዲጂታል ዓለም ወርቅ" የሚያገለግለውን ሲሊከን (Silicon) ንጥረ ነገር አብረን እንቃኛለን። ሲሊከን እንዴት የዘመኑ ቴክኖሎጂ መሰረት ሊሆን ቻለ? ከየትስ ይገኛል?..."
+                        </span>
+                    </p>
+                    <div class="flex justify-center space-x-4">
+                        <a href="https://docs.google.com/document/d/1PupeMnXWwAtJplxK5ImQ3J9QEpVCgVvEEN6t97hcctU/edit?usp=drive_link" target="_blank" rel="noopener noreferrer" class="bg-gradient-to-r from-gray-900 to-gray-700 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base">View Full Sample</a>
+                        <a href="#order" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base" data-scroll>Order Tech Script</a>
+                    </div>
+                </div>
+                
+                <!-- Business Sample -->
+                <div class="portfolio-card fade-in-up bg-white p-6 rounded-2xl shadow-md">
+                    <h3 class="text-lg sm:text-xl font-semibold text-center mb-2 sm:mb-4 text-gray-900">Business Script</h3>
+                    <p class="text-gray-600 text-sm sm:text-base mb-4">
+                        <span class="portfolio-highlight font-bold text-red-600">
+                            " በዚህ ነገሮች እንደ ዓይን ጥቅሻ በሚለዋወጡበት ዘመን ከዘመኑ ጋር መዘምን አማራጭ ሳይሆን የግድ ይሎታል! 
+                            ለመፍጠን ከፈለጉ ደግሞ ሁሉንም ነገር እርሶ መሥራት አይጠበቅቦትም! ..."
+                        </span>
+                    </p>
+                    <div class="flex justify-center space-x-4">
+                        <a href="https://docs.google.com/document/d/1ZYI5YqtiIIv9x0ySJoPumrf3XfQd9gFgDsl7q4R_fwA/edit?usp=drive_link" target="_blank" rel="noopener noreferrer" class="bg-gradient-to-r from-gray-900 to-gray-700 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base">View Full Sample</a>
+                        <a href="#order" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base" data-scroll>Order Business Script</a>
+                    </div>
+                </div>
+                
+                <!-- EOTC Sample -->
+                <div class="portfolio-card fade-in-up bg-white p-6 rounded-2xl shadow-md">
+                    <h3 class="text-lg sm:text-xl font-semibold text-center mb-2 sm:mb-4 text-gray-900">EOTC Spiritual Script</h3>
+                    <p class="text-gray-600 text-sm sm:text-base mb-4">
+                        <span class="portfolio-highlight font-bold text-red-600">
+                            " ንብ እና አበባ እንዴት ተዛመዱ? ... እንግዲህ እነዚህ ማሰብ እና ማሰላሰል የማይችሉ እንዲሁም በወገን እንኳን የማይገናኙ እጽዋእት እና ነፍሳት ተግባብተው አንዱ አንዱ እያገለገሉ የሚኖሩ ከሆኑ እኛ አንድ ወገን የሆንን የሰው ልጆች አንዳችን አንዳችንን እያገለገልን በማገልገል ውስጥ ለራሳችን እየተገለገልን እንዳንኖር የከለከለን ምንድነው? ..."
+                        </span>
+                    </p>
+                    <div class="flex justify-center space-x-4">
+                        <a href="https://docs.google.com/document/d/1zcoh8HYsp2kpsQtujDmc_Dakk39mxdeZrJGn804rVos/edit?usp=sharing" target="_blank" rel="noopener noreferrer" class="bg-gradient-to-r from-gray-900 to-gray-700 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base">View Full Sample</a>
+                        <a href="#order" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 px-4 rounded-full shadow-lg hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base" data-scroll>Order EOTC Script</a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-8 fade-in-up">
+                <a href="#order" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-3 sm:py-4 px-8 sm:px-10 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-base sm:text-lg" data-scroll>Get Your Custom Script Today</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- BLOG SECTION -->
     <section id="blog" class="py-12 sm:py-16 md:py-20 bg-white">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-6 sm:mb-8 md:mb-12 fade-in-up">Our Blog</h2>
@@ -214,236 +260,390 @@
         </div>
     </section>
 
-        <!-- Order Section -->
-        <section id="order" class="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-gray-50 to-white">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center fade-in-up">
-                <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 sm:mb-6 text-gray-900">How to Place an Order</h2>
-                <p class="text-base sm:text-lg text-gray-700 max-w-xl sm:max-w-2xl md:max-w-3xl mx-auto mb-4 sm:mb-8 leading-relaxed">Fill out our Google Form to start your project. We’ll contact you via your provided telegram username or email to discuss details and handle payment securely.</p>
-                <a href="https://docs.google.com/forms/d/e/1FAIpQLSc_oZ-3MRfnn1w7rqSXk8leixjMI_8L94HihD8CFvJ8R0sDqQ/viewform?usp=dialog" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-3 sm:py-4 px-6 sm:px-10 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-base sm:text-lg glowing-button" target="_blank" rel="noopener noreferrer">Fill the form here and Get it Now</a>
-            </div>
-        </section>
+    <!-- Order Section -->
+    <section id="order" class="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-gray-50 to-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center fade-in-up">
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 sm:mb-6 text-gray-900">How to Place an Order</h2>
+            <p class="text-base sm:text-lg text-gray-700 max-w-xl sm:max-w-2xl md:max-w-3xl mx-auto mb-4 sm:mb-8 leading-relaxed">Fill out our Google Form to start your project. We’ll contact you via your provided telegram username or email to discuss details and handle payment securely.</p>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSc_oZ-3MRfnn1w7rqSXk8leixjMI_8L94HihD8CFvJ8R0sDqQ/viewform?usp=dialog" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-3 sm:py-4 px-6 sm:px-10 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-base sm:text-lg glowing-button" target="_blank" rel="noopener noreferrer">Fill the form here and Get it Now</a>
+        </div>
+    </section>
 
-        <!-- Team Section -->
-        <section id="team" class="py-12 sm:py-16 md:py-20 bg-white">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-6 sm:mb-8 md:mb-12 fade-in-up">Meet the Team</h2>
-                <div class="flex justify-center">
-                    <div class="team-grid grid grid-cols-1 md:grid-cols-2 gap-8 auto-rows-auto max-w-5xl w-full px-4">
-                        <!-- Team Member 1 -->
-                        <div class="text-center fade-in-up team-member">
-                            <img class="w-24 sm:w-28 md:w-32 h-24 sm:h-28 md:h-32 mx-auto rounded-full object-cover mb-3 sm:mb-4 shadow-md" src="images/photo_2024-01-12_13-44-25.jpg" alt="Fisehatsion Adisu, Lead Script Writer" loading="lazy">
-                            <h3 class="text-lg sm:text-xl font-bold text-gray-900">Fisehatsion Adisu</h3>
-                            <p class="text-gray-600 mb-1 sm:mb-2">Lead Script Writer & Founder of Behabeshawikana</p>
-                            <p class="text-sm text-gray-500 mb-2 sm:mb-4">Over 1 year in scriptwriting and content creation, specializing in character-driven storytelling. I’ve written 9+ successful YouTube video scripts, all production-ready and produced. As the lead script writer at Behabeshawikana, I ensure every script aligns with the brand vision and delivers high-quality, engaging content. Passionate about authentic storytelling that connects and inspires.</p>
-                            <div class="flex justify-center space-x-3 sm:space-x-4">
-                                <a href="https://www.facebook.com/dfisa.adisu" aria-label="Facebook profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-                                </a>
-                                <a href="https://www.linkedin.com/in/fisehatsion-adisu-abute-929279208" aria-label="LinkedIn profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
-                                </a>
-                                <a href="https://www.instagram.com/dfisaadisu?igsh=YzljYTk1ODg3Zg==" aria-label="Instagram profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                                </a>
-                                <a href="https://vm.tiktok.com/ZMAFrYpFy/" aria-label="TikTok profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12a4 4 0 1 0 4-4 4 4 0 0 0-4 4zm0 0v6a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2v-2"></path><path d="M12 10v6"></path><path d="M12 8h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-3"></path><path d="M19 8V6a2 2 0 0 0-2-2h-2"></path></svg>
-                                </a>
-                                <a href="https://t.me/fisiha1224" aria-label="Telegram profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 17-5-4-3 2-3-10 13-5z"></path></svg>
-                                </a>
-                            </div>
-                            <div class="mt-4">
-                                <a href="https://fisehatsion-adisu-portfolio.netlify.app/" aria-label="Visit my portfolio" class="inline-flex items-center bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 px-4 sm:px-6 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button">
-                                    Visit my portfolio
-                                </a>
-                            </div>
+    <!-- Team Section -->
+    <section id="team" class="py-12 sm:py-16 md:py-20 bg-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-6 sm:mb-8 md:mb-12 fade-in-up">Meet the Team</h2>
+            <div class="flex justify-center">
+                <div class="team-grid grid grid-cols-1 md:grid-cols-2 gap-8 auto-rows-auto max-w-5xl w-full px-4">
+                    <!-- Team Member 1 -->
+                    <div class="text-center fade-in-up team-member">
+                        <img class="w-24 sm:w-28 md:w-32 h-24 sm:h-28 md:h-32 mx-auto rounded-full object-cover mb-3 sm:mb-4 shadow-md" src="images/photo_2024-01-12_13-44-25.jpg" alt="Fisehatsion Adisu, Lead Script Writer" loading="lazy">
+                        <h3 class="text-lg sm:text-xl font-bold text-gray-900">Fisehatsion Adisu</h3>
+                        <p class="text-gray-600 mb-1 sm:mb-2">Lead Script Writer & Founder of Behabeshawikana</p>
+                        <p class="text-sm text-gray-500 mb-2 sm:mb-4">Over 1 year in scriptwriting and content creation, specializing in character-driven storytelling. I’ve written 9+ successful YouTube video scripts, all production-ready and produced. As the lead script writer at Behabeshawikana, I ensure every script aligns with the brand vision and delivers high-quality, engaging content. Passionate about authentic storytelling that connects and inspires.</p>
+                        <div class="flex justify-center space-x-3 sm:space-x-4">
+                            <a href="https://www.facebook.com/dfisa.adisu" aria-label="Facebook profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                            </a>
+                            <a href="https://www.linkedin.com/in/fisehatsion-adisu-abute-929279208" aria-label="LinkedIn profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                            </a>
+                            <a href="https://www.instagram.com/dfisaadisu?igsh=YzljYTk1ODg3Zg==" aria-label="Instagram profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                            </a>
+                            <a href="https://vm.tiktok.com/ZMAFrYpFy/" aria-label="TikTok profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12a4 4 0 1 0 4-4 4 4 0 0 0-4 4zm0 0v6a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2v-2"></path><path d="M12 10v6"></path><path d="M12 8h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-3"></path><path d="M19 8V6a2 2 0 0 0-2-2h-2"></path></svg>
+                            </a>
+                            <a href="https://t.me/fisiha1224" aria-label="Telegram profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 17-5-4-3 2-3-10 13-5z"></path></svg>
+                            </a>
                         </div>
-                        <!-- Team Member 2 -->
-                        <div class="text-center fade-in-up team-member">
-                            <img class="w-24 sm:w-28 md:w-32 h-24 sm:h-28 md:h-32 mx-auto rounded-full object-cover mb-3 sm:mb-4 shadow-md" src="images/photo_2025-08-24_14-55-47.jpg" alt="Augustin Habte, EOTC Content Writer" loading="lazy">
-                            <h3 class="text-lg sm:text-xl font-bold text-gray-900">Augustin Habte</h3>
-                            <p class="text-gray-600 mb-1 sm:mb-2">Advisor & EOTC-based Content Writer</p>
-                            <p class="text-sm text-gray-500 mb-2 sm:mb-4">Expert in developing engaging narratives with cultural and spiritual depth, Maintains a consistent and compelling narrative tone across all projects, ensuring cultural authenticity.</p>
-                            <div class="flex justify-center space-x-3 sm:space-x-4">
-                                <a href="https://www.facebook.com/agustin.habte.2025" aria-label="Facebook profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
-                                </a>
-                                <a href="https://www.linkedin.com/in/agustin-habte-320013381" aria-label="LinkedIn profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
-                                </a>
-                                <a href="https://www.instagram.com/agustinhabte?igsh=djIyM3M1Znl6YnEy" aria-label="Instagram profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-                                </a>
-                                <a href="https://www.tiktok.com/@agustin.habte?_t=ZM-8z7hD0lclW9&_r=1" aria-label="TikTok profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12a4 4 0 1 0 4-4 4 4 0 0 0-4 4zm0 0v6a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2v-2"></path><path d="M12 10v6"></path><path d="M12 8h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-3"></path><path d="M19 8V6a2 2 0 0 0-2-2h-2"></path></svg>
-                                </a>
-                                <a href="http://t.me/Aagape12" aria-label="Telegram profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 17-5-4-3 2-3-10 13-5z"></path></svg>
-                                </a>
-                            </div>
-                            <div class="mt-4">
-                                <a href="https://www.tiktok.com/@agustin.habte?_t=ZM-8z7hD0lclW9&_r=1" aria-label="Visit my portfolio" class="inline-flex items-center bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 px-4 sm:px-6 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button">
-                                    Visit my portfolio
-                                </a>
-                            </div>
+                        <div class="mt-4">
+                            <a href="https://fisehatsion-adisu-portfolio.netlify.app/" aria-label="Visit my portfolio" class="inline-flex items-center bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 px-4 sm:px-6 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button">
+                                Visit my portfolio
+                            </a>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
-
-   
-
-    <!-- YOUR ORIGINAL CONTACT & FOOTER (unchanged) -->
-    <!-- ... (all your existing code from contact, FAQ, footer, chatbot, etc.) ... -->
-
-     <!-- Contact & FAQ Section -->
-        <section id="contact" class="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-gray-50 to-white">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-6 sm:mb-8 md:mb-12 fade-in-up">Contact & Support</h2>
-                <div class="max-w-md sm:max-w-lg md:max-w-xl mx-auto space-y-8 sm:space-y-12">
-                    <!-- Contact Form -->
-                    <div class="fade-in-up flex justify-center">
-                        <form action="https://formspree.io/f/myzpqybo" method="POST" class="space-y-4 sm:space-y-6 w-full max-w-xs">
-                            <div>
-                                <label for="email" class="block text-gray-700 font-semibold mb-1 sm:mb-2">Your Email</label>
-                                <input type="email" id="email" name="email" class="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 transition text-sm sm:text-base" required>
-                            </div>
-                            <div>
-                                
-                                <label for="message" class="block text-gray-700 font-semibold mb-1 sm:mb-2">Your Message</label>
-                                <textarea id="message" name="message" rows="3" class="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 transition text-sm sm:text-base" required></textarea>
-                            </div>
-                            <div class="text-center">
-                                <button type="submit" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 sm:py-3 px-6 sm:px-10 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base">Send Message Now</button>
-                            </div>
-                            <input type="hidden" name="_cc" value="fieshatech@gmail.com">
-                        </form>
-                    </div>
-                    <!-- FAQ Section -->
-                    <div class="fade-in-up">
-                        <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">Frequently Asked Questions</h3>
-                        <div class="space-y-3 sm:space-y-4">
-                            <div class="faq-item">
-                                <details>
-                                    <summary class="font-semibold text-gray-800 text-sm sm:text-base">What types of content do you specialize in?</summary>
-                                    <div class="mt-2 p-3 sm:p-4 rounded-b-lg text-gray-600 text-sm sm:text-base">We offer Tech related Content, EOTC Spiritual Content, and Business Content for various needs.</div>
-                                </details>
-                            </div>
-                            <div class="faq-item">
-                                <details>
-                                    <summary class="font-semibold text-gray-800 text-sm sm:text-base">How do I place an order?</summary>
-                                    <div class="mt-2 p-3 sm:p-4 rounded-b-lg text-gray-600 text-sm sm:text-base">Fill out the Google Form in the Order section, and we’ll contact you via telegram username or email as soon as possible with in 24 hours. So, Check you telegram account after submitting the form.</div>
-                                </details>
-                            </div>
-                            <div class="faq-item">
-                                <details>
-                                    <summary class="font-semibold text-gray-800 text-sm sm:text-base">What is the payment process?</summary>
-                                    <div class="mt-2 p-3 sm:p-4 rounded-b-lg text-gray-600 text-sm sm:text-base">Payment details are provided via your telegram username or email after we discuss your project.</div>
-                                </details>
-                            </div>
-                            <div class="faq-item">
-                                <details>
-                                    <summary class="font-semibold text-gray-800 text-sm sm:text-base">Do you develop software products?</summary>
-                                    <div class="mt-2 p-3 sm:p-4 rounded-b-lg text-gray-600 text-sm sm:text-base">Yes, we develop custom software solutions tailored to your needs. Types of software we develop include custom Telegram bots, minimalistic web applications for now. Talk to Fisehatsion with the contacts above for more details.</div>
-                                </details>
-                            </div>
-                            <div class="faq-item">
-                                <details>
-                                    <summary class="font-semibold text-gray-800 text-sm sm:text-base">Do you give short training on how to use AI for productivity?</summary>
-                                    <div class="mt-2 p-3 sm:p-4 rounded-b-lg text-gray-600 text-sm sm:text-base">Yes, we offer short training sessions on using AI tools and techniques to enhance productivity.</div>
-                                </details>
-                            </div>
+                    <!-- Team Member 2 -->
+                    <div class="text-center fade-in-up team-member">
+                        <img class="w-24 sm:w-28 md:w-32 h-24 sm:h-28 md:h-32 mx-auto rounded-full object-cover mb-3 sm:mb-4 shadow-md" src="images/photo_2025-08-24_14-55-47.jpg" alt="Augustin Habte, EOTC Content Writer" loading="lazy">
+                        <h3 class="text-lg sm:text-xl font-bold text-gray-900">Augustin Habte</h3>
+                        <p class="text-gray-600 mb-1 sm:mb-2">Advisor & EOTC-based Content Writer</p>
+                        <p class="text-sm text-gray-500 mb-2 sm:mb-4">Expert in developing engaging narratives with cultural and spiritual depth, Maintains a consistent and compelling narrative tone across all projects, ensuring cultural authenticity.</p>
+                        <div class="flex justify-center space-x-3 sm:space-x-4">
+                            <a href="https://www.facebook.com/agustin.habte.2025" aria-label="Facebook profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                            </a>
+                            <a href="https://www.linkedin.com/in/agustin-habte-320013381" aria-label="LinkedIn profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                            </a>
+                            <a href="https://www.instagram.com/agustinhabte?igsh=djIyM3M1Znl6YnEy" aria-label="Instagram profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                            </a>
+                            <a href="https://www.tiktok.com/@agustin.habte?_t=ZM-8z7hD0lclW9&_r=1" aria-label="TikTok profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12a4 4 0 1 0 4-4 4 4 0 0 0-4 4zm0 0v6a2 2 0 0 0 2 2h3a2 2 0 0 0 2-2v-2"></path><path d="M12 10v6"></path><path d="M12 8h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-3"></path><path d="M19 8V6a2 2 0 0 0-2-2h-2"></path></svg>
+                            </a>
+                            <a href="http://t.me/Aagape12" aria-label="Telegram profile" class="text-gray-500 hover:text-gray-800 transition social-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 17-5-4-3 2-3-10 13-5z"></path></svg>
+                            </a>
+                        </div>
+                        <div class="mt-4">
+                            <a href="https://www.tiktok.com/@agustin.habte?_t=ZM-8z7hD0lclW9&_r=1" aria-label="Visit my portfolio" class="inline-flex items-center bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 px-4 sm:px-6 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button">
+                                Visit my portfolio
+                            </a>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Footer -->
-        <footer class="bg-gradient-to-b from-gray-900 to-gray-800 text-white py-6 sm:py-8">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <div class="mb-4 sm:mb-6 flex justify-center">
-                    <a href="https://t.me/behabeshawi_kana_support_center" aria-label="Join us on Telegram" class="inline-flex items-center bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-3 px-6 sm:px-8 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button w-full sm:w-auto max-w-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2"><path d="M21 2l-2 17-5-4-3 2-3-10 13-5z"></path></svg>
-                        Join us on Telegram
-                    </a>
-                </div>
-                <p class="text-sm sm:text-base">&copy; 2025 Behabeshawikana. All rights reserved.</p>
-            </div>
-        </footer>
-
-        <!-- Chatbot Modal -->
-        <div id="chatbot-modal" class="hidden">
-            <div class="chat-window">
-                <div class="chat-header bg-gradient-to-r from-gray-900 to-gray-700">
-                    <h3 class="font-bold text-white text-sm sm:text-base">Behabeshawikana Bot</h3>
-                    <button id="close-chatbot" class="text-white text-lg font-bold">&times;</button>
-                </div>
-                <div id="chat-body" class="chat-body">
-                    <div class="message bot-message text-sm sm:text-base">Hello! How can I help you with our services today?</div>
-                </div>
-                <div class="chat-input">
-                    <input type="text" id="chat-input" placeholder="Type your message..." class="flex-grow p-2 sm:p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm sm:text-base">
-                    <button id="chat-send" class="bg-gradient-to-r from-gray-900 to-gray-700 text-white p-2 sm:p-3 rounded-lg hover:bg-gray-700 transition" title="Send message">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                    </button>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- JavaScript -->
-        <script>
-            // Smooth Scroll for Navigation
-            document.querySelectorAll('a[data-scroll]').forEach(link => {
-                link.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const targetId = link.getAttribute('href');
-                    const targetElement = document.querySelector(targetId);
-                    if (targetElement) {
-                        window.scrollTo({
-                            top: targetElement.offsetTop,
-                            behavior: 'smooth'
-                        });
-                    }
+    <!-- Contact & FAQ Section -->
+    <section id="contact" class="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-gray-50 to-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-center mb-6 sm:mb-8 md:mb-12 fade-in-up">Contact & Support</h2>
+            <div class="max-w-md sm:max-w-lg md:max-w-xl mx-auto space-y-8 sm:space-y-12">
+                <!-- Contact Form -->
+                <div class="fade-in-up flex justify-center">
+                    <form action="https://formspree.io/f/myzpqybo" method="POST" class="space-y-4 sm:space-y-6 w-full max-w-xs">
+                        <div>
+                            <label for="email" class="block text-gray-700 font-semibold mb-1 sm:mb-2">Your Email</label>
+                            <input type="email" id="email" name="email" class="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 transition text-sm sm:text-base" required>
+                        </div>
+                        <div>
+                            
+                            <label for="message" class="block text-gray-700 font-semibold mb-1 sm:mb-2">Your Message</label>
+                            <textarea id="message" name="message" rows="3" class="w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900 transition text-sm sm:text-base" required></textarea>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-2 sm:py-3 px-6 sm:px-10 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button text-sm sm:text-base">Send Message Now</button>
+                        </div>
+                        <input type="hidden" name="_cc" value="fieshatech@gmail.com">
+                    </form>
+                </div>
+                <!-- FAQ Section -->
+                <div class="fade-in-up">
+                    <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">Frequently Asked Questions</h3>
+                    <div class="space-y-3 sm:space-y-4">
+                        <div class="faq-item">
+                            <details>
+                                <summary class="font-semibold text-gray-800 text-sm sm:text-base cursor-pointer">What types of content do you specialize in?</summary>
+                                <div class="mt-2 p-3 sm:p-4 rounded-b-lg text-gray-600 text-sm sm:text-base bg-gray-50">We offer Tech related Content, EOTC Spiritual Content, and Business Content for various needs.</div>
+                            </details>
+                        </div>
+                        <div class="faq-item">
+                            <details>
+                                <summary class="font-semibold text-gray-800 text-sm sm:text-base cursor-pointer">How do I place an order?</summary>
+                                <div class="mt-2 p-3 sm:p-4 rounded-b-lg text-gray-600 text-sm sm:text-base bg-gray-50">Fill out the Google Form in the Order section, and we’ll contact you via telegram username or email as soon as possible with in 24 hours. So, Check you telegram account after submitting the form.</div>
+                            </details>
+                        </div>
+                        <div class="faq-item">
+                            <details>
+                                <summary class="font-semibold text-gray-800 text-sm sm:text-base cursor-pointer">What is the payment process?</summary>
+                                <div class="mt-2 p-3 sm:p-4 rounded-b-lg text-gray-600 text-sm sm:text-base bg-gray-50">Payment details are provided via your telegram username or email after we discuss your project.</div>
+                            </details>
+                        </div>
+                        <div class="faq-item">
+                            <details>
+                                <summary class="font-semibold text-gray-800 text-sm sm:text-base cursor-pointer">Do you develop software products?</summary>
+                                <div class="mt-2 p-3 sm:p-4 rounded-b-lg text-gray-600 text-sm sm:text-base bg-gray-50">Yes, we develop custom software solutions tailored to your needs. Types of software we develop include custom Telegram bots, minimalistic web applications for now. Talk to Fisehatsion with the contacts above for more details.</div>
+                            </details>
+                        </div>
+                        <div class="faq-item">
+                            <details>
+                                <summary class="font-semibold text-gray-800 text-sm sm:text-base cursor-pointer">Do you give short training on how to use AI for productivity?</summary>
+                                <div class="mt-2 p-3 sm:p-4 rounded-b-lg text-gray-600 text-sm sm:text-base bg-gray-50">Yes, we offer short training sessions on using AI tools and techniques to enhance productivity.</div>
+                            </details>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<footer class="bg-gradient-to-b from-gray-900 to-gray-800 text-white py-6 sm:py-8">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="mb-4 sm:mb-6 flex justify-center">
+            <a href="https://t.me/behabeshawi_kana_support_center" aria-label="Join us on Telegram" class="inline-flex items-center bg-gradient-to-r from-blue-600 to-blue-400 text-white font-bold py-3 px-6 sm:px-8 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 cta-button w-full sm:w-auto max-w-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-2"><path d="M21 2l-2 17-5-4-3 2-3-10 13-5z"></path></svg>
+                Join us on Telegram
+            </a>
+        </div>
+        <p class="text-sm sm:text-base">&copy; 2025 Behabeshawikana. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- Chatbot Modal -->
+<div id="chatbot-modal" class="hidden">
+    <div class="chat-window">
+        <div class="chat-header bg-gradient-to-r from-gray-900 to-gray-700">
+            <h3 class="font-bold text-white text-sm sm:text-base">Behabeshawikana Bot</h3>
+            <button id="close-chatbot" class="text-white text-lg font-bold">&times;</button>
+        </div>
+        <div id="chat-body" class="chat-body">
+            <div class="message bot-message text-sm sm:text-base">Hello! How can I help you with our services today?</div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chat-input" placeholder="Type your message..." class="flex-grow p-2 sm:p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-900 text-sm sm:text-base">
+            <button id="chat-send" class="bg-gradient-to-r from-gray-900 to-gray-700 text-white p-2 sm:p-3 rounded-lg hover:bg-gray-700 transition" title="Send message">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { GoogleGenAI } from "@google/genai";
+    import { marked } from "marked";
+
+    // --- NAVIGATION LOGIC ---
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuIcon = document.getElementById('menu-icon');
+    const closeIcon = document.getElementById('close-icon');
+    const header = document.getElementById('main-header');
+
+    // Toggle Mobile Menu
+    menuBtn.addEventListener('click', () => {
+        const isHidden = mobileMenu.classList.contains('hidden');
+        if (isHidden) {
+            mobileMenu.classList.remove('hidden');
+            menuIcon.classList.add('hidden');
+            closeIcon.classList.remove('hidden');
+        } else {
+            mobileMenu.classList.add('hidden');
+            menuIcon.classList.remove('hidden');
+            closeIcon.classList.add('hidden');
+        }
+    });
+
+    // Close menu on link click
+    mobileMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            mobileMenu.classList.add('hidden');
+            menuIcon.classList.remove('hidden');
+            closeIcon.classList.add('hidden');
+        });
+    });
+
+    // Scroll Effect
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 10) {
+            header.classList.add('shadow-lg', 'bg-white/95');
+            header.classList.remove('bg-white/90');
+        } else {
+            header.classList.remove('shadow-lg', 'bg-white/95');
+            header.classList.add('bg-white/90');
+        }
+    });
+
+    // --- SMOOTH SCROLL FOR ALL ANCHORS ---
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            if(targetId === '#') return;
+            const target = document.querySelector(targetId);
+            if (target) {
+                // Offset for fixed header
+                const headerOffset = 80;
+                const elementPosition = target.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: "smooth"
                 });
-            });
+            }
+        });
+    });
 
-            // Animate on Scroll
-            const fadeElements = document.querySelectorAll('.fade-in-up');
-            const observerOptions = {
-                root: null,
-                rootMargin: '0px',
-                threshold: 0.1
-            };
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            }, observerOptions);
-            fadeElements.forEach(element => observer.observe(element));
+    // --- ANIMATE ON SCROLL ---
+    const fadeElements = document.querySelectorAll('.fade-in-up');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.1 });
+    fadeElements.forEach(element => observer.observe(element));
 
-            // Simple Chatbot Logic with Gemini API Integration
-            const chatbotModal = document.getElementById('chatbot-modal');
-            const closeChatbot = document.getElementById('close-chatbot');
-            const chatInput = document.getElementById('chat-input');
-            const chatSendBtn = document.getElementById('chat-send');
-            const chatBody = document.getElementById('chat-body');
+    // --- BLOG LOGIC ---
+    const REPO_OWNER = "Fisehazion";
+    const REPO_NAME = "habesha200";
 
-            // Gemini API key
-            const apiKey = 'AIzaSyB0wES8Ue1guwXa9lkzNSxdRDtVEY2e-RI';
+    async function loadBlogPosts() {
+        const container = document.getElementById('blog-posts');
+        const detail = document.getElementById('blog-detail');
+        if(!container) return;
 
-            // Gemini API endpoint
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        try {
+            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/content/blog`);
+            if (!res.ok) throw new Error("Failed to load posts");
 
-            // Chat history for context
-            let chatHistory = [];
+            const files = await res.json();
+            const mdFiles = files
+                .filter(f => f.name.endsWith('.md'))
+                .sort((a, b) => b.name.localeCompare(a.name));
 
-            // Static website content for context
-            const websiteContent = `
+            if (mdFiles.length === 0) {
+                container.innerHTML = `<p class="col-span-full text-center text-gray-600 text-xl py-12">No blog posts yet – coming soon!</p>`;
+                return;
+            }
+
+            container.innerHTML = ''; 
+
+            for (const file of mdFiles) {
+                const raw = await (await fetch(file.download_url)).text();
+                
+                // Simple Frontmatter Parser
+                const frontmatter = {};
+                const fmMatch = raw.match(/^---\s*([\s\S]*?)\s*---/);
+                if (fmMatch) {
+                    fmMatch[1].split('\n').forEach(line => {
+                        const [key, ...val] = line.split(':');
+                        if (key && val) frontmatter[key.trim()] = val.join(':').trim().replace(/^["']|["']$/g, '');
+                    });
+                }
+
+                const body = raw.replace(/^---[\s\S]*?---/, '').trim();
+                const html = marked.parse(body);
+
+                const card = document.createElement('div');
+                card.className = "bg-white border border-gray-200 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition transform hover:scale-105 cursor-pointer flex flex-col h-full";
+                
+                card.innerHTML = `
+                    ${frontmatter.image ? `<img src="${frontmatter.image.startsWith('/') ? frontmatter.image : '/' + frontmatter.image}" alt="${frontmatter.title || ''}" class="w-full h-48 object-cover">` : ''}
+                    <div class="p-6 flex-grow flex flex-col">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2 line-clamp-2">${frontmatter.title || file.name.replace('.md', '').replace(/-/g, ' ')}</h3>
+                        ${frontmatter.excerpt ? `<p class="text-gray-600 mb-4 line-clamp-3">${frontmatter.excerpt}</p>` : ''}
+                        <div class="mt-auto">
+                             <p class="text-sm text-gray-500 mb-3">${frontmatter.date ? new Date(frontmatter.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'No date'}</p>
+                             <span class="text-blue-600 font-bold hover:underline">Read More →</span>
+                        </div>
+                    </div>
+                `;
+
+                card.onclick = () => {
+                    // Render Detail View
+                    detail.innerHTML = `
+                        <button id="back-to-blog" class="mb-8 text-blue-600 font-bold text-lg hover:underline">&larr; Back to Blog</button>
+                        <article class="prose prose-lg max-w-none">
+                            ${frontmatter.title ? `<h1 class="text-4xl font-extrabold mb-6">${frontmatter.title}</h1>` : ''}
+                            ${frontmatter.image ? `<img src="${frontmatter.image.startsWith('/') ? frontmatter.image : '/' + frontmatter.image}" class="w-full rounded-xl object-contain mb-8 shadow-md">` : ''}
+                            ${frontmatter.youtube ? `<div class="my-12"><iframe class="w-full aspect-video rounded-xl shadow-lg" src="https://www.youtube.com/embed/${frontmatter.youtube}" frameborder="0" allowfullscreen></iframe></div>` : ''}
+                            ${html}
+                        </article>
+                    `;
+                    
+                    document.getElementById('back-to-blog').onclick = () => {
+                        detail.classList.add('hidden');
+                        container.classList.remove('hidden');
+                        // Scroll back to blog section top
+                        const blogSection = document.getElementById('blog');
+                        const headerOffset = 80;
+                        const elementPosition = blogSection.getBoundingClientRect().top;
+                        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                        window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+                    };
+
+                    container.classList.add('hidden');
+                    detail.classList.remove('hidden');
+                    // Scroll to top of blog section
+                    const blogSection = document.getElementById('blog');
+                    const headerOffset = 80;
+                    const elementPosition = blogSection.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                    window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+                };
+
+                container.appendChild(card);
+            }
+        } catch (err) {
+            console.error("Blog error:", err);
+            container.innerHTML = `<p class="col-span-full text-center text-red-600 py-8">Blog loading failed. Please try again later.</p>`;
+        }
+    }
+
+    // Load blog when section is visible
+    const blogSection = document.getElementById('blog');
+    if (blogSection) {
+        const blogObserver = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                loadBlogPosts();
+                blogObserver.disconnect(); 
+            }
+        });
+        blogObserver.observe(blogSection);
+    }
+
+    // --- CHATBOT LOGIC (Gemini SDK) ---
+    const chatbotModal = document.getElementById('chatbot-modal');
+    const closeChatbot = document.getElementById('close-chatbot');
+    const chatInput = document.getElementById('chat-input');
+    const chatSendBtn = document.getElementById('chat-send');
+    const chatBody = document.getElementById('chat-body');
+
+    // Chatbot Open Button
+    const chatOpenButton = document.createElement('button');
+    chatOpenButton.className = 'fixed bottom-6 right-6 p-4 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 z-50 animate-pulse';
+    chatOpenButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>`;
+    document.body.appendChild(chatOpenButton);
+
+    chatOpenButton.addEventListener('click', () => {
+        chatbotModal.style.display = 'flex';
+        chatbotModal.classList.remove('hidden');
+    });
+
+    closeChatbot.addEventListener('click', () => {
+        chatbotModal.style.display = 'none';
+    });
+
+    // Content context
+    const websiteContent = `
 Behabeshawikana offers expert script writing and content development for tech, business, EOTC spiritual, and other needs.
 
 About: Behabeshawikana transforms ideas into stories that captivate and inspire. Our diverse team creates authentic, high-quality content tailored to tech related, spiritual, and business needs. From research-driven tech content to meaningful EOTC spiritual works, we’re dedicated to delivering excellence.
@@ -453,221 +653,57 @@ Services:
 - EOTC Spiritual Contents: Uplifting content scripts based on Ethiopian Orthodox Tewahedo Church traditions.
 - Business Related Contents: Promotional scripts and ad copy to effectively reach your audience.
 
-Order: Fill out the Google Form at https://docs.google.com/forms/d/e/1FAIpQLSc_oZ-3MRfnn1w7rqSXk8leixjMI_8L94HihD8CFvJ8R0sDqQ/viewform to start your project. We’ll contact you via email or telegram to discuss details and handle payment securely.
+Order: Fill out the Google Form. We’ll contact you via email or telegram to discuss details and handle payment securely.
 
 Team:
-- Fisehatsion Adisu: Lead Script Writer & Founder of Behabeshawikana. Over 1 year in scriptwriting and content creation. Social links: Facebook https://www.facebook.com/dfisa.adisu, LinkedIn https://www.linkedin.com/in/fisehatsion-adisu-abute-929279208, Instagram https://www.instagram.com/dfisaadisu?igsh=YzljYTk1ODg3Zg==, TikTok https://vm.tiktok.com/ZMAFrYpFy/, Telegram https://t.me/fisiha1224.
-- Augustin Habte: Advisor & EOTC-based Content Writer. Expert in developing engaging narratives with cultural and spiritual depth. Social links: Facebook https://www.facebook.com/agustin.habte.2025, LinkedIn #, Instagram https://instagram.com/agustinhabte?igsh=djIyM3M1Znl6YnEy, TikTok https://www.tiktok.com/@agustin.habte?_t=ZM-8z7hD0lclW9&_r=1, Telegram http://t.me/Aagape12.
+- Fisehatsion Adisu: Lead Script Writer & Founder.
+- Augustin Habte: Advisor & EOTC-based Content Writer.
 
-Portfolio: Sample scripts available for EOTC spiritual content, tech content, and business scripts. View samples at https://behabeshawikana.netlify.app/#portfolio.
+Portfolio: Sample scripts available for EOTC spiritual content, tech content, and business scripts.
+    `;
 
-Contact: Use the form to send email and message. FAQs: Specialize in tech, EOTC, business content. Place order via form, contact within 24 hours. Payment details via telegram or email.
-            `;
+    // API Setup
+    // Note: In a real production app, never expose your API key in client-side code.
+    const apiKey = 'AIzaSyB0wES8Ue1guwXa9lkzNSxdRDtVEY2e-RI'; 
+    const ai = new GoogleGenAI({ apiKey: apiKey });
 
-            function addMessage(text, isUser = false) {
-                const messageDiv = document.createElement('div');
-                messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
-                messageDiv.textContent = text;
-                chatBody.appendChild(messageDiv);
-                chatBody.scrollTop = chatBody.scrollHeight;
-            }
-
-            async function sendMessage() {
-                const userMessage = chatInput.value.trim();
-                if (!userMessage) return;
-
-                addMessage(userMessage, true);
-                chatHistory.push({ role: "user", parts: [{ text: userMessage }] });
-                chatInput.value = '';
-
-                // System prompt with website content
-                const systemPrompt = `You are a helpful chatbot for Behabeshawikana website. Use the following website content to answer questions accurately: ${websiteContent}. Focus on simple questions about services, order, team, portfolio, etc. If the question is unrelated, politely redirect to website topics.`;
-
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            system_instruction: {
-                                parts: [{ text: systemPrompt }]
-                            },
-                            contents: chatHistory
-                        })
-                    });
-
-                    if (!response.ok) {
-                        throw new Error('API request failed');
-                    }
-
-                    const data = await response.json();
-                    const botResponse = data.candidates[0].content.parts[0].text;
-                    addMessage(botResponse);
-                    chatHistory.push({ role: "model", parts: [{ text: botResponse }] });
-                } catch (error) {
-                    addMessage('Sorry, there was an error connecting to the AI service. Please try again later.');
-                    console.error(error);
-                }
-            }
-
-            chatSendBtn.addEventListener('click', sendMessage);
-            chatInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') sendMessage();
-            });
-
-            closeChatbot.addEventListener('click', () => {
-                chatbotModal.style.display = 'none';
-            });
-
-            // Chatbot Open Button
-            const chatOpenButton = document.createElement('button');
-            chatOpenButton.id = 'open-chatbot';
-            chatOpenButton.className = 'fixed bottom-6 right-6 p-4 bg-gradient-to-r from-gray-900 to-gray-700 text-white rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition duration-300 z-50';
-            chatOpenButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>`;
-            document.body.appendChild(chatOpenButton);
-            chatOpenButton.addEventListener('click', () => {
-                chatbotModal.style.display = 'flex';
-            });
-
-
-            // Back to Top Button
-            const backToTop = document.getElementById('back-to-top');
-            if (backToTop) {
-                window.addEventListener('scroll', () => {
-                    if (window.scrollY > 300) {
-                        backToTop.classList.remove('hidden');
-                        backToTop.classList.add('visible');
-                    } else {
-                        backToTop.classList.add('hidden');
-                        backToTop.classList.remove('visible');
-                    }
-                });
-                backToTop.addEventListener('click', () => {
-                    window.scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                });
-            }
-
-            // Toggle Mobile Menu
-            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
-            const mobileMenu = document.getElementById('mobile-menu');
-            if (mobileMenuToggle && mobileMenu) {
-                mobileMenuToggle.addEventListener('click', () => {
-                    mobileMenu.classList.toggle('hidden');
-                });
-
-                // Close mobile menu when clicking outside
-                document.addEventListener('click', (e) => {
-                    if (!mobileMenuToggle.contains(e.target) && !mobileMenu.contains(e.target)) {
-                        mobileMenu.classList.add('hidden');
-                    }
-                });
-            }
-        </script>
-
-
-
-</main>
-
-<script>
-// === ALL YOUR ORIGINAL JS REMAINS UNTOUCHED (smooth scroll, chatbot, mobile menu, etc.) ===
-// (Keep everything you already have above this line)
-
-// ————————————————————————
-// UPDATED BLOG SYSTEM – FULLY COMPATIBLE WITH SVELTIA CMS
-// ————————————————————————
-
-const REPO_OWNER = "Fisehazion";
-const REPO_NAME = "habesha200";
-
-async function loadBlogPosts() {
-  const container = document.getElementById('blog-posts');
-  const detail = document.getElementById('blog-detail');
-
-  try {
-    const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/content/blog`);
-    if (!res.ok) throw new Error("Failed to load posts");
-
-    const files = await res.json();
-    const mdFiles = files
-      .filter(f => f.name.endsWith('.md'))
-      .sort((a, b) => b.name.localeCompare(a.name)); // newest first
-
-    if (mdFiles.length === 0) {
-      container.innerHTML = `<p class="col-span-full text-center text-gray-600 text-xl py-12">No blog posts yet – coming soon!</p>`;
-      return;
+    function addMessage(text, isUser = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', isUser ? 'user-message' : 'bot-message');
+        messageDiv.textContent = text;
+        chatBody.appendChild(messageDiv);
+        chatBody.scrollTop = chatBody.scrollHeight;
     }
 
-    container.innerHTML = ''; // clear loading state
+    async function sendMessage() {
+        const userMessage = chatInput.value.trim();
+        if (!userMessage) return;
 
-    for (const file of mdFiles) {
-      const raw = await (await fetch(file.download_url)).text();
+        addMessage(userMessage, true);
+        chatInput.value = '';
 
-      // Parse frontmatter
-      const frontmatter = {};
-      const fmMatch = raw.match(/^---\s*([\s\S]*?)\s*---/);
-      if (fmMatch) {
-        fmMatch[1].split('\n').forEach(line => {
-          const [key, ...val] = line.split(':');
-          if (key && val) frontmatter[key.trim()] = val.join(':').trim().replace(/^["']|["']$/g, '');
-        });
-      }
+        try {
+            const model = ai.getGenerativeModel({ 
+                model: "gemini-2.5-flash",
+                systemInstruction: "You are a helpful chatbot for Behabeshawikana website. Use the provided website content to answer questions accurately. Be concise."
+            });
 
-      const body = raw.replace(/^---[\s\S]*?---/, '').trim();
-      const html = marked.parse(body);
-
-      const card = document.createElement('div');
-      card.className = "bg-white border border-gray-200 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition transform hover:scale-105 cursor-pointer";
-      
-      card.innerHTML = `
-        ${frontmatter.image ? `<img src="${frontmatter.image.startsWith('/') ? frontmatter.image : '/' + frontmatter.image}" alt="${frontmatter.title || ''}" class="w-full h-48 object-cover">` : ''}
-        <div class="p-6">
-          <h3 class="text-2xl font-bold text-gray-900 mb-2">${frontmatter.title || file.name.replace('.md', '').replace(/-/g, ' ')}</h3>
-          ${frontmatter.excerpt ? `<p class="text-gray-600 mb-4">${frontmatter.excerpt}</p>` : ''}
-          <p class="text-sm text-gray-500">${frontmatter.date ? new Date(frontmatter.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'No date'}</p>
-          <button class="mt-4 text-blue-600 font-bold hover:underline">Read More →</button>
-        </div>
-      `;
-
-      card.onclick = () => {
-        detail.innerHTML = `
-          <button onclick="backToList()" class="mb-8 text-blue-600 font-bold text-lg hover:underline">&larr; Back to Blog</button>
-          <article class="prose prose-lg max-w-none">
-            ${frontmatter.title ? `<h1 class="text-4xl font-extrabold mb-6">${frontmatter.title}</h1>` : ''}
-           ${frontmatter.image ? `<img src="${frontmatter.image.startsWith('/') ? frontmatter.image : '/' + frontmatter.image}" alt="${frontmatter.title || ''}" class="w-full rounded-t-2xl object-contain bg-gray-50 border-b border-gray-200 cursor-pointer transition-transform hover:scale-[1.02]" loading="lazy" onclick="openLightbox('${frontmatter.image.startsWith('/') ? frontmatter.image : '/' + frontmatter.image}')">` : ''}
-            ${frontmatter.youtube ? `<div class="my-12"><iframe class="w-full aspect-video rounded-xl" src="https://www.youtube.com/embed/${frontmatter.youtube}" frameborder="0" allowfullscreen></iframe></div>` : ''}
-            ${html}
-          </article>
-        `;
-        container.classList.add('hidden');
-        detail.classList.remove('hidden');
-        window.scrollTo(0, document.getElementById('blog').offsetTop - 100);
-      };
-
-      container.appendChild(card);
+            const result = await model.generateContent(`Context: ${websiteContent}\n\nQuestion: ${userMessage}`);
+            const response = await result.response;
+            const text = response.text();
+            
+            addMessage(text);
+        } catch (error) {
+            console.error(error);
+            addMessage("I'm sorry, I'm having trouble connecting right now. Please try again later.");
+        }
     }
-  } catch (err) {
-    console.error("Blog error:", err);
-    container.innerHTML = `<p class="col-span-full text-center text-red-600 py-8">Blog loading failed. Check console or try later.</p>`;
-  }
-}
 
-function backToList() {
-  document.getElementById('blog-detail').classList.add('hidden');
-  document.getElementById('blog-posts').classList.remove('hidden');
-}
+    chatSendBtn.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
 
-// Auto-load when blog section is visible
-new IntersectionObserver(entries => {
-  if (entries[0].isIntersecting) {
-    loadBlogPosts();
-  }
-}).observe(document.getElementById('blog'));
-
-console.log('%c Blog System Loaded Successfully! Ready to post!', 'color: #10b981; font-size: 16px; font-weight: bold;');
 </script>
 
 </body>
